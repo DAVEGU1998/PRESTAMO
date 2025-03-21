@@ -1,108 +1,125 @@
-package prestamo;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MENU_STANDAR extends javax.swing.JFrame {
 
     public MENU_STANDAR() {
         initComponents();
-        setPlaceholderText(USUARIO, "Usuario");
-        setPlaceholderText(CONTRASEÑA, "Contraseña");
-        
-        // Evitar que el foco se coloque automáticamente en USUARIO o CONTRASEÑA
-        // Haciendo que el foco inicial se ponga en el panel vacío
-        jPanel1.requestFocusInWindow();  // Poner el foco en el panel vacío
-        
-        // Deshabilitar la maximización de la ventana
-        setResizable(false); // Evita que la ventana sea redimensionable
+        makeButtonsTransparent();
+        addButtonHoverEffect();
     }
 
-    // Método para agregar texto de sugerencia (placeholder) con movimiento y cambio de tamaño
-    private void setPlaceholderText(JTextField textField, String placeholder) {
-        // Crear un JLabel que funcionará como el texto de sugerencia
-        JLabel label = new JLabel(placeholder);
-        label.setForeground(Color.GRAY);
-        label.setFont(new Font("Arial", Font.PLAIN, 16));
-        label.setBounds(10, 0, 200, 40);  // Ajustar posición y tamaño
-
-        // Añadir el JLabel al panel, no al JTextField directamente
-        textField.setLayout(null);  // Establecer el layout a null para que puedas colocar componentes libremente
-        textField.add(label);
-
-        // Cuando el campo recibe el foco, mueve el JLabel hacia arriba y reduce el tamaño
-        textField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (textField.getText().isEmpty()) {
-                    // Mover el texto hacia arriba y reducir el tamaño
-                    label.setBounds(10, -20, 200, 20);
-                    label.setFont(new Font("Arial", Font.PLAIN, 12));  // Reducir el tamaño del texto
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (textField.getText().isEmpty()) {
-                    // Si el campo está vacío, regresar el JLabel a su posición original
-                    label.setBounds(10, 0, 200, 40);
-                    label.setFont(new Font("Arial", Font.PLAIN, 16));  // Volver al tamaño original
-                }
-            }
-        });
+    private void makeButtonsTransparent() {
+        JButton[] buttons = {perfil, salas, equipos, pqrs};
+        for (JButton button : buttons) {
+            button.setOpaque(false);
+            button.setContentAreaFilled(false);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+            button.setForeground(Color.WHITE); // Color del texto
+        }
     }
 
-    @SuppressWarnings("unchecked")
+    private void addButtonHoverEffect() {
+        JButton[] buttons = {perfil, salas, equipos, pqrs};
+        for (JButton button : buttons) {
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    button.setBackground(new Color(0, 0, 128)); // Azul oscuro
+                    button.setOpaque(true);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    button.setBackground(jLabel3.getBackground()); // Fondo del jLabel3
+                    button.setOpaque(false);
+                }
+            });
+        }
+    }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        USUARIO = new javax.swing.JTextField();
-        CONTRASEÑA = new javax.swing.JTextField();
-        INGRESAR = new javax.swing.JToggleButton();
-        ICON = new javax.swing.JLabel();
-        FONDO2 = new javax.swing.JLabel();
-        FONDO = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        pqrs = new javax.swing.JButton();
+        perfil = new javax.swing.JButton();
+        equipos = new javax.swing.JButton();
+        salas = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(51, 255, 204));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel1.add(USUARIO, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 370, 260, 40));
-        jPanel1.add(CONTRASEÑA, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 450, 260, 40));
 
-        INGRESAR.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        INGRESAR.setText("INGRESAR");
-        jPanel1.add(INGRESAR, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 530, 130, 40));
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("SISTEMA DE PRESTAMO ");
+        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 0, 300, 70));
 
-        ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/usuario (1).png"))); // NOI18N
-        jPanel1.add(ICON, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 150, -1, 180));
+        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel1.setOpaque(true);
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1160, 70));
 
-        FONDO2.setBackground(new java.awt.Color(255, 255, 255));
-        FONDO2.setForeground(new java.awt.Color(255, 255, 255));
-        FONDO2.setOpaque(true);
-        jPanel1.add(FONDO2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 100, 640, 530));
+        pqrs.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        pqrs.setText("PQRS");
+        pqrs.setBorder(null);
+        pqrs.setBorderPainted(false);
+        pqrs.setFocusable(false);
+        jPanel1.add(pqrs, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 400, 180, 50));
 
-        FONDO.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/images (1).jpg"))); // NOI18N
-        FONDO.setPreferredSize(new java.awt.Dimension(1169, 779));
-        jPanel1.add(FONDO, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1170, -1));
+        perfil.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        perfil.setText("PERFIL");
+        perfil.setBorder(null);
+        perfil.setBorderPainted(false);
+        perfil.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                perfilActionPerformed(evt);
+            }
+        });
+        jPanel1.add(perfil, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 160, 180, 50));
+
+        equipos.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        equipos.setText("EQUIPOS");
+        equipos.setBorder(null);
+        equipos.setBorderPainted(false);
+        jPanel1.add(equipos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 320, 180, 50));
+
+        salas.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        salas.setText("SALAS");
+        salas.setBorder(null);
+        salas.setBorderPainted(false);
+        jPanel1.add(salas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 180, 50));
+
+        jLabel3.setBackground(new java.awt.Color(102, 153, 255));
+        jLabel3.setOpaque(true);
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 180, 710));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1164, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1164, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void perfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_perfilActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_perfilActionPerformed
 
     /**
      * @param args the command line arguments
@@ -140,12 +157,13 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField CONTRASEÑA;
-    private javax.swing.JLabel FONDO;
-    private javax.swing.JLabel FONDO2;
-    private javax.swing.JLabel ICON;
-    private javax.swing.JToggleButton INGRESAR;
-    private javax.swing.JTextField USUARIO;
+    private javax.swing.JButton equipos;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton perfil;
+    private javax.swing.JButton pqrs;
+    private javax.swing.JButton salas;
     // End of variables declaration//GEN-END:variables
 }
