@@ -9,8 +9,8 @@ import java.sql.ResultSet;
 public class CONEXION {
     
     private static final String URL = "jdbc:oracle:thin:@192.168.254.215:1521:orcl"; 
-    private static final String USER = "PRESTAMO055";
-    private static final String PASSWORD = "DAVEGU0518";
+    private static final String USER = "PRESTAMO2025";
+    private static final String PASSWORD = "DAVEGU";
 
     public static Connection conectar() {
         Connection conexion = null;

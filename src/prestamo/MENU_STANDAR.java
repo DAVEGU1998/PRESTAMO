@@ -1,40 +1,51 @@
+package prestamo;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MENU_STANDAR extends javax.swing.JFrame {
-
+    
     public MENU_STANDAR() {
         initComponents();
-        makeButtonsTransparent();
-        addButtonHoverEffect();
+        setTitle("Menú Principal");
+        setSize(1164, 779); // Ajustado al tamaño de tu diseño
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Configuración de botones
+        configureButtons();
     }
-
-    private void makeButtonsTransparent() {
+    
+    private void configureButtons() {
         JButton[] buttons = {perfil, salas, equipos, pqrs};
+        
+        // Hacer botones transparentes
         for (JButton button : buttons) {
             button.setOpaque(false);
             button.setContentAreaFilled(false);
             button.setBorderPainted(false);
             button.setFocusPainted(false);
-            button.setForeground(Color.WHITE); // Color del texto
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Arial", Font.BOLD, 16));
         }
-    }
-
-    private void addButtonHoverEffect() {
-        JButton[] buttons = {perfil, salas, equipos, pqrs};
+        
+        // Efecto hover
+        Color hoverColor = new Color(0, 0, 128); // Azul oscuro
+        Color normalColor = jLabel3.getBackground();
+        
         for (JButton button : buttons) {
             button.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    button.setBackground(new Color(0, 0, 128)); // Azul oscuro
+                    button.setBackground(hoverColor);
                     button.setOpaque(true);
                 }
-
+                
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    button.setBackground(jLabel3.getBackground()); // Fondo del jLabel3
+                    button.setBackground(normalColor);
                     button.setOpaque(false);
                 }
             });
@@ -69,21 +80,21 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 0, 300, 70));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/pqr 24.png"))); // NOI18N
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 40, 50));
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 400, 40, 50));
 
         jLabel1.setBackground(new java.awt.Color(0, 0, 0));
         jLabel1.setOpaque(true);
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1160, 70));
 
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/gente512.png"))); // NOI18N
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 164, -1, 40));
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/perfil32.png"))); // NOI18N
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 164, -1, 40));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/salones 24.png"))); // NOI18N
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 243, 30, 40));
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/salas 32.png"))); // NOI18N
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 243, 40, 40));
 
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/equipo24.png"))); // NOI18N
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 30, 50));
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/EQUIPOS 32.png"))); // NOI18N
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 320, 40, 50));
 
         pqrs.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         pqrs.setText("PQRS");

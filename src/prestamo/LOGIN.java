@@ -1,64 +1,115 @@
 package prestamo;
-
+import CONEXION.CONEXION;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
 
 public class LOGIN extends javax.swing.JFrame {
-
+    // Declaración de componentes
+    
+    
     public LOGIN() {
         initComponents();
-        setPlaceholderText(USUARIO, "Usuario");
-        setPlaceholderText(CONTRASEÑA, "Contraseña");
-        
-        // Evitar que el foco se coloque automáticamente en USUARIO o CONTRASEÑA
-        // Haciendo que el foco inicial se ponga en el panel vacío
-        jPanel1.requestFocusInWindow();  // Poner el foco en el panel vacío
-        
-        // Deshabilitar la maximización de la ventana
-        setResizable(false); // Evita que la ventana sea redimensionable
+        setPlaceholderText(USUARIO, "Correo");
+        setPasswordFieldPlaceholder(CONTRASEÑA, "Contraseña");
+        setResizable(false);
+        setLocationRelativeTo(null); // Centrar ventana
+
+        INGRESAR.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                validarUsuario();
+            }
+        });
     }
 
-    // Método para agregar texto de sugerencia (placeholder) con movimiento y cambio de tamaño
-    private void setPlaceholderText(JTextField textField, String placeholder) {
-        // Crear un JLabel que funcionará como el texto de sugerencia
-        JLabel label = new JLabel(placeholder);
-        label.setForeground(Color.GRAY);
-        label.setFont(new Font("Arial", Font.PLAIN, 16));
-        label.setBounds(10, 0, 200, 40);  // Ajustar posición y tamaño
+    private void validarUsuario() {
+        String correo = USUARIO.getText().trim();
+        String contraseña = new String(CONTRASEÑA.getPassword()).trim();
 
-        // Añadir el JLabel al panel, no al JTextField directamente
-        textField.setLayout(null);  // Establecer el layout a null para que puedas colocar componentes libremente
-        textField.add(label);
+        if (correo.isEmpty() || contraseña.isEmpty() || correo.equals("Correo") || contraseña.equals("Contraseña")) {
+            JOptionPane.showMessageDialog(this, "Ingrese usuario y contraseña válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        // Cuando el campo recibe el foco, mueve el JLabel hacia arriba y reduce el tamaño
-        textField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (textField.getText().isEmpty()) {
-                    // Mover el texto hacia arriba y reducir el tamaño
-                    label.setBounds(10, -20, 200, 20);
-                    label.setFont(new Font("Arial", Font.PLAIN, 12));  // Reducir el tamaño del texto
-                }
+        Connection conexion = CONEXION.conectar();
+        if (conexion == null) {
+            JOptionPane.showMessageDialog(this, "Error de conexión.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String sql = "SELECT * FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
+        try {
+            PreparedStatement pst = conexion.prepareStatement(sql);
+            pst.setString(1, correo);
+            pst.setString(2, contraseña);
+
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(this, "Bienvenido " + correo, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose(); // Cierra la ventana de login
+                
+                // Abre el MENU_STANDAR
+                SwingUtilities.invokeLater(() -> {
+                    MENU_STANDAR menu = new MENU_STANDAR();
+                    menu.setVisible(true);
+                    menu.setLocationRelativeTo(null); // Centrar el menú
+                });
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
             }
 
+            rs.close();
+            pst.close();
+            conexion.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al validar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void setPlaceholderText(JTextField field, String placeholder) {
+        field.setText(placeholder);
+        field.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
-            public void focusLost(FocusEvent e) {
-                if (textField.getText().isEmpty()) {
-                    // Si el campo está vacío, regresar el JLabel a su posición original
-                    label.setBounds(10, 0, 200, 40);
-                    label.setFont(new Font("Arial", Font.PLAIN, 16));  // Volver al tamaño original
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (field.getText().isEmpty()) {
+                    field.setText(placeholder);
                 }
             }
         });
     }
-    
-    // Método para agregar los enlaces debajo del campo de contraseña
-   
 
-       
+    private void setPasswordFieldPlaceholder(JPasswordField field, String placeholder) {
+        field.setEchoChar((char)0);
+        field.setText(placeholder);
+        field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (String.valueOf(field.getPassword()).equals(placeholder)) {
+                    field.setText("");
+                    field.setEchoChar('*');
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (String.valueOf(field.getPassword()).isEmpty()) {
+                    field.setEchoChar((char)0);
+                    field.setText(placeholder);
+                }
+            }
+        });
+    }
 
     @SuppressWarnings("unchecked")
     
@@ -67,7 +118,7 @@ public class LOGIN extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         USUARIO = new javax.swing.JTextField();
-        CONTRASEÑA = new javax.swing.JTextField();
+        CONTRASEÑA = new javax.swing.JPasswordField();
         OLVIDE = new javax.swing.JLabel();
         OLVIDE1 = new javax.swing.JLabel();
         INGRESAR = new javax.swing.JToggleButton();
@@ -91,6 +142,8 @@ public class LOGIN extends javax.swing.JFrame {
             }
         });
         jPanel1.add(USUARIO, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 360, 260, 40));
+
+        CONTRASEÑA.setText("jPasswordField1");
         jPanel1.add(CONTRASEÑA, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 420, 260, 40));
 
         OLVIDE.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
@@ -158,51 +211,22 @@ public class LOGIN extends javax.swing.JFrame {
     private void USUARIOKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_USUARIOKeyTyped
     char c = evt.getKeyChar();
     // Aceptar solo letras mayúsculas y espacios
-        if ((c < 'A' || c > 'Z') && c != KeyEvent.VK_SPACE) {
-            evt.consume(); // Ignorar el evento
-    } 
-    if (USUARIO.getText().length ()>=15) 
+    if (USUARIO.getText().length ()>=20) 
             evt.consume();     // TODO add your handling code here:
     }//GEN-LAST:event_USUARIOKeyTyped
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LOGIN().setVisible(true);
-            }
+     public static void main(String args[]) {
+        SwingUtilities.invokeLater(() -> {
+            new LOGIN().setVisible(true);
         });
     }
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField CONTRASEÑA;
+    private javax.swing.JPasswordField CONTRASEÑA;
     private javax.swing.JLabel FONDO;
     private javax.swing.JLabel FONDO2;
     private javax.swing.JLabel ICON;
@@ -213,3 +237,5 @@ public class LOGIN extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
+
+
