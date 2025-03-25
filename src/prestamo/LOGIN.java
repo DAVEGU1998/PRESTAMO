@@ -117,8 +117,8 @@ public class LOGIN extends javax.swing.JFrame {
         INGRESAR.setText("INGRESAR");
         jPanel1.add(INGRESAR, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 510, 130, 40));
 
-        ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/usuario (1).png"))); // NOI18N
-        jPanel1.add(ICON, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 150, -1, 180));
+        ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/usuario 512px.png"))); // NOI18N
+        jPanel1.add(ICON, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 170, 130, 160));
 
         FONDO2.setBackground(new java.awt.Color(255, 255, 255));
         FONDO2.setForeground(new java.awt.Color(255, 255, 255));
