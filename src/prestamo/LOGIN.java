@@ -28,49 +28,52 @@ public class LOGIN extends javax.swing.JFrame {
     }
 
     private void validarUsuario() {
-        String correo = USUARIO.getText().trim();
-        String contraseña = new String(CONTRASEÑA.getPassword()).trim();
+    String correo = USUARIO.getText().trim();
+    String contraseña = new String(CONTRASEÑA.getPassword()).trim();
 
-        if (correo.isEmpty() || contraseña.isEmpty() || correo.equals("Correo") || contraseña.equals("Contraseña")) {
-            JOptionPane.showMessageDialog(this, "Ingrese usuario y contraseña válidos.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Connection conexion = CONEXION.conectar();
-        if (conexion == null) {
-            JOptionPane.showMessageDialog(this, "Error de conexión.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String sql = "SELECT * FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
-        try {
-            PreparedStatement pst = conexion.prepareStatement(sql);
-            pst.setString(1, correo);
-            pst.setString(2, contraseña);
-
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(this, "Bienvenido " + correo, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                this.dispose(); // Cierra la ventana de login
-                
-                // Abre el MENU_STANDAR
-                SwingUtilities.invokeLater(() -> {
-                    MENU_STANDAR menu = new MENU_STANDAR();
-                    menu.setVisible(true);
-                    menu.setLocationRelativeTo(null); // Centrar el menú
-                });
-            } else {
-                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
-            }
-
-            rs.close();
-            pst.close();
-            conexion.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al validar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+    if (correo.isEmpty() || contraseña.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese usuario y contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
     }
+
+    Connection conexion = CONEXION.conectar();
+    if (conexion == null) {
+        JOptionPane.showMessageDialog(this, "Error de conexión.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // Consulta para obtener el nombre del usuario
+    String sql = "SELECT NOMBRE FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
+    try {
+        PreparedStatement pst = conexion.prepareStatement(sql);
+        pst.setString(1, correo);
+        pst.setString(2, contraseña);
+
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {  // Si hay coincidencia en la base de datos
+            String nombreUsuario = rs.getString("NOMBRE");  // Obtener el nombre del usuario
+            
+
+            this.dispose();  // Cierra la ventana de login
+
+            // Crear una instancia de MENU_STANDAR y pasar el nombre del usuario
+            MENU_STANDAR menu = new MENU_STANDAR();
+            menu.setNombreUsuario(nombreUsuario);
+            menu.setVisible(true);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+        }
+
+        rs.close();
+        pst.close();
+        conexion.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al validar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+
 
     private void setPlaceholderText(JTextField field, String placeholder) {
         field.setText(placeholder);

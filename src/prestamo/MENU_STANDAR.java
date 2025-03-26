@@ -17,7 +17,13 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         // Configuración de botones
         configureButtons();
     }
-    
+    public void setNombreUsuario(String nombreUsuario) {
+    nombre.setText(nombreUsuario);
+    nombre.setForeground(java.awt.Color.WHITE); // Asegura que el texto sea negro
+    nombre.setEnabled(true);  // Asegura que no esté deshabilitado
+    nombre.repaint();  // Vuelve a pintar el JLabel para aplicar los cambios
+}
+
     private void configureButtons() {
         JButton[] buttons = {perfil, salas, equipos, pqrs};
         
@@ -56,6 +62,8 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        nombre = new javax.swing.JLabel();
+        bienvenido = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -67,11 +75,20 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         equipos = new javax.swing.JButton();
         salas = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        contenedor = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        nombre.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 20, 270, 30));
+
+        bienvenido.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        bienvenido.setForeground(new java.awt.Color(255, 255, 255));
+        bienvenido.setText("BIENVENIDO:");
+        jPanel1.add(bienvenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 20, 130, 30));
 
         jLabel2.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -101,7 +118,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         pqrs.setBorder(null);
         pqrs.setBorderPainted(false);
         pqrs.setFocusable(false);
-        jPanel1.add(pqrs, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 400, 180, 50));
+        jPanel1.add(pqrs, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 400, 140, 50));
 
         perfil.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         perfil.setText("PERFIL");
@@ -112,23 +129,38 @@ public class MENU_STANDAR extends javax.swing.JFrame {
                 perfilActionPerformed(evt);
             }
         });
-        jPanel1.add(perfil, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 160, 180, 50));
+        jPanel1.add(perfil, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 140, 50));
 
         equipos.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         equipos.setText("EQUIPOS");
         equipos.setBorder(null);
         equipos.setBorderPainted(false);
-        jPanel1.add(equipos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 320, 180, 50));
+        jPanel1.add(equipos, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 140, 50));
 
         salas.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         salas.setText("SALAS");
         salas.setBorder(null);
         salas.setBorderPainted(false);
-        jPanel1.add(salas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 180, 50));
+        jPanel1.add(salas, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
 
         jLabel3.setBackground(new java.awt.Color(102, 153, 255));
         jLabel3.setOpaque(true);
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 180, 710));
+
+        contenedor.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout contenedorLayout = new javax.swing.GroupLayout(contenedor);
+        contenedor.setLayout(contenedorLayout);
+        contenedorLayout.setHorizontalGroup(
+            contenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 980, Short.MAX_VALUE)
+        );
+        contenedorLayout.setVerticalGroup(
+            contenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 710, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(contenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 70, 980, 710));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -184,6 +216,8 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel bienvenido;
+    private javax.swing.JPanel contenedor;
     private javax.swing.JButton equipos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -193,8 +227,11 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel nombre;
     private javax.swing.JButton perfil;
     private javax.swing.JButton pqrs;
     private javax.swing.JButton salas;
     // End of variables declaration//GEN-END:variables
+
+   
 }
