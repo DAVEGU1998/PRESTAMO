@@ -2,6 +2,7 @@ package prestamo;
 import CONEXION.CONEXION;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,15 @@ public class LOGIN extends javax.swing.JFrame {
         setPasswordFieldPlaceholder(CONTRASEÑA, "Contraseña");
         setResizable(false);
         setLocationRelativeTo(null); // Centrar ventana
-
+        CONTRASEÑA.addKeyListener(new java.awt.event.KeyAdapter() {
+    @Override
+    public void keyPressed(KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            validarUsuario(); // Llama la función que usa el botón
+        }
+    }
+});
+    
         INGRESAR.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -42,23 +51,22 @@ public class LOGIN extends javax.swing.JFrame {
         return;
     }
 
-    // Consulta para obtener el nombre del usuario
-    String sql = "SELECT NOMBRE FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
+    // Consulta modificada para obtener nombre y correo
+    String sql = "SELECT NOMBRE, CORREO FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
     try {
         PreparedStatement pst = conexion.prepareStatement(sql);
         pst.setString(1, correo);
         pst.setString(2, contraseña);
 
         ResultSet rs = pst.executeQuery();
-        if (rs.next()) {  // Si hay coincidencia en la base de datos
-            String nombreUsuario = rs.getString("NOMBRE");  // Obtener el nombre del usuario
-            
+        if (rs.next()) {
+            String nombreUsuario = rs.getString("NOMBRE");
+            String correoUsuario = rs.getString("CORREO"); // Obtenemos el correo
 
-            this.dispose();  // Cierra la ventana de login
+            this.dispose();
 
-            // Crear una instancia de MENU_STANDAR y pasar el nombre del usuario
             MENU_STANDAR menu = new MENU_STANDAR();
-            menu.setNombreUsuario(nombreUsuario);
+            menu.setDatosUsuario(nombreUsuario, correoUsuario); // Pasamos ambos datos
             menu.setVisible(true);
 
         } else {
@@ -73,7 +81,6 @@ public class LOGIN extends javax.swing.JFrame {
         e.printStackTrace();
     }
 }
-
 
     private void setPlaceholderText(JTextField field, String placeholder) {
         field.setText(placeholder);
@@ -134,6 +141,7 @@ public class LOGIN extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(51, 255, 204));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        USUARIO.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         USUARIO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 USUARIOActionPerformed(evt);
@@ -157,7 +165,7 @@ public class LOGIN extends javax.swing.JFrame {
                 OLVIDEMouseClicked(evt);
             }
         });
-        jPanel1.add(OLVIDE, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 550, -1, 20));
+        jPanel1.add(OLVIDE, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 550, 80, 20));
 
         OLVIDE1.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
         OLVIDE1.setForeground(new java.awt.Color(0, 51, 255));
@@ -167,7 +175,7 @@ public class LOGIN extends javax.swing.JFrame {
                 OLVIDE1MouseClicked(evt);
             }
         });
-        jPanel1.add(OLVIDE1, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 460, -1, 20));
+        jPanel1.add(OLVIDE1, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 460, 130, 20));
 
         INGRESAR.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         INGRESAR.setText("INGRESAR");

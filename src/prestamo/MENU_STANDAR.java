@@ -2,21 +2,27 @@ package prestamo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MENU_STANDAR extends javax.swing.JFrame {
-    
+     // Asegurar que está declarado como variable de clase
+    private String correoUsuario;
     public MENU_STANDAR() {
         initComponents();
         setTitle("Menú Principal");
-        setSize(1164, 779); // Ajustado al tamaño de tu diseño
+        setSize(1164, 779);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // Configuración de botones
-        configureButtons();
-    }
+    
+    // Configuración inicial del contenedor
+    contenedor.setLayout(new BorderLayout());
+    
+    // Configuración de botones
+    configureButtons();
+}
     public void setNombreUsuario(String nombreUsuario) {
     nombre.setText(nombreUsuario);
     nombre.setForeground(java.awt.Color.WHITE); // Asegura que el texto sea negro
@@ -24,40 +30,64 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     nombre.repaint();  // Vuelve a pintar el JLabel para aplicar los cambios
 }
 
-    private void configureButtons() {
-        JButton[] buttons = {perfil, salas, equipos, pqrs};
-        
-        // Hacer botones transparentes
-        for (JButton button : buttons) {
-            button.setOpaque(false);
-            button.setContentAreaFilled(false);
-            button.setBorderPainted(false);
-            button.setFocusPainted(false);
-            button.setForeground(Color.WHITE);
-            button.setFont(new Font("Arial", Font.BOLD, 16));
-        }
-        
-        // Efecto hover
-        Color hoverColor = new Color(0, 0, 128); // Azul oscuro
-        Color normalColor = jLabel3.getBackground();
-        
-        for (JButton button : buttons) {
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    button.setBackground(hoverColor);
-                    button.setOpaque(true);
-                }
-                
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    button.setBackground(normalColor);
-                    button.setOpaque(false);
-                }
-            });
-        }
+   private void configureButtons() {
+    JButton[] buttons = {perfil, salas, equipos, pqrs};
+    
+    // Hacer botones transparentes
+    for (JButton button : buttons) {
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Arial", Font.BOLD, 16));
     }
     
+    // Efecto hover
+    Color hoverColor = new Color(0, 0, 128);
+    Color normalColor = jLabel3.getBackground();
+    
+    for (JButton button : buttons) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverColor);
+                button.setOpaque(true);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(normalColor);
+                button.setOpaque(false);
+            }
+            
+        });
+    }
+
+    // ✅ Agregar evento al botón "perfil" para cambiar de panel
+    perfil.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PERFIL perfilPanel = new PERFIL();
+                // Pasar ambos datos al panel PERFIL
+                perfilPanel.setDatosUsuario(nombre.getText(), correoUsuario);
+                mostrarPanel(perfilPanel);
+            }
+        });
+    }
+    public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
+        this.correoUsuario = correoUsuario;
+        nombre.setText(nombreUsuario);
+        nombre.setForeground(Color.WHITE);
+        nombre.repaint();
+    }
+    private void mostrarPanel(JPanel panel) {
+    contenedor.removeAll();
+    contenedor.add(panel, BorderLayout.CENTER);
+    contenedor.revalidate();
+    contenedor.repaint();
+}
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -148,6 +178,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 180, 710));
 
         contenedor.setBackground(new java.awt.Color(255, 255, 255));
+        contenedor.setMaximumSize(new java.awt.Dimension(32767, 3000));
 
         javax.swing.GroupLayout contenedorLayout = new javax.swing.GroupLayout(contenedor);
         contenedor.setLayout(contenedorLayout);
@@ -177,6 +208,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void perfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_perfilActionPerformed
+    
         // TODO add your handling code here:
     }//GEN-LAST:event_perfilActionPerformed
 
