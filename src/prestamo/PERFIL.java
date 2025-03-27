@@ -1,15 +1,87 @@
 package prestamo;
 
+import CONEXION.CONEXION;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PERFIL extends JPanel {
-
-    public PERFIL() {
-        initComponents(); // Llama a la inicialización de los componentes
-        setPreferredSize(new Dimension(980, 710)); // Ajusta según necesidades
-        
+    private String idUsuario; // Para almacenar el ID del usuario
+    private JCheckBox mostrarContraseña;
+    private void limpiarCamposContraseña() {
+        con_actual.setText("");
+        con_nueva.setText("");
     }
+    public PERFIL() {
+        initComponents();
+        setPreferredSize(new Dimension(980, 710));
+    
+    // Configurar el checkbox
+    mostrarContraseña = new JCheckBox("Mostrar contraseña");
+    mostrarContraseña.setFont(new Font("Arial", Font.PLAIN, 12));
+    mostrarContraseña.setOpaque(false); // Para que no se vea el fondo
+    
+    // Añadir al panel con coordenadas específicas (ajusta estos valores)
+    jPanel1.add(mostrarContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(756, 580, 150, 25));
+    
+    // Configurar el listener
+    mostrarContraseña.addActionListener(e -> {
+        char echoChar = mostrarContraseña.isSelected() ? (char)0 : '•';
+        con_actual.setEchoChar(echoChar);
+        con_nueva.setEchoChar(echoChar);
+    });
+        // Configurar el combo box de campus
+        campus.setModel(new javax.swing.DefaultComboBoxModel<>(
+            new String[] {"SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA"}));
+    }
+    public void cargarDatosUsuario(String nombreUsuario, String correoUsuario) {
+        nombre.setText(nombreUsuario);
+        correo.setText(correoUsuario);
+        nombre.setForeground(Color.WHITE);
+        correo.setForeground(Color.WHITE);
+        Connection conexion = CONEXION.conectar();
+        if (conexion == null) {
+            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String sql = "SELECT ID, NOMBRE, APELLIDO, CORREO, CAMPUS FROM USUARIOS WHERE CORREO = ?";
+        
+        try {
+            PreparedStatement pst = conexion.prepareStatement(sql);
+            pst.setString(1, correoUsuario);
+            
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                this.idUsuario = rs.getString("ID");
+                u_nombre.setText(rs.getString("NOMBRE"));
+                u_apellido.setText(rs.getString("APELLIDO"));
+                u_correo.setText(rs.getString("CORREO"));
+                
+                // Configurar el campus seleccionado
+                String campusUsuario = rs.getString("CAMPUS");
+                for (int i = 0; i < campus.getItemCount(); i++) {
+                    if (campus.getItemAt(i).equals(campusUsuario)) {
+                        campus.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+            
+            rs.close();
+            pst.close();
+            conexion.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar datos del usuario", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
+    // Método para actualizar los datos del usuario
+    
 // En la clase PERFIL
 public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
         nombre.setText(nombreUsuario);
@@ -25,6 +97,7 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
         correo.revalidate();
         correo.repaint();
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -90,7 +163,7 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
                 con_guardarActionPerformed(evt);
             }
         });
-        jPanel1.add(con_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 600, 150, 40));
+        jPanel1.add(con_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 610, 160, 40));
 
         con_nueva.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel1.add(con_nueva, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 540, 210, 40));
@@ -119,7 +192,7 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
                 u_guardar1ActionPerformed(evt);
             }
         });
-        jPanel1.add(u_guardar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 360, 150, 40));
+        jPanel1.add(u_guardar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 360, 160, 40));
 
         campus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         campus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
@@ -169,10 +242,119 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void con_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_con_guardarActionPerformed
-        // TODO add your handling code here:
+    
+    String contraseñaActual = new String(con_actual.getPassword()).trim();
+    String nuevaContraseña = new String(con_nueva.getPassword()).trim();
+    if (contraseñaActual.contains("'") || nuevaContraseña.contains("'")) {
+        JOptionPane.showMessageDialog(this, "Caracteres no permitidos en la contraseña", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    // Validación básica
+    if (contraseñaActual.isEmpty() || nuevaContraseña.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ambos campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    if (nuevaContraseña.length() < 1) {
+        JOptionPane.showMessageDialog(this, "La contraseña actual que ingresaste esta incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    Connection conexion = CONEXION.conectar();
+    if (conexion == null) {
+        JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // 1. Verificar que la contraseña actual sea correcta
+    String sqlVerificar = "SELECT CONTRASEÑA FROM USUARIOS WHERE ID = ?";
+    
+    try {
+        // Verificación de contraseña actual
+        PreparedStatement pstVerificar = conexion.prepareStatement(sqlVerificar);
+        pstVerificar.setString(1, this.idUsuario);
+        
+        ResultSet rs = pstVerificar.executeQuery();
+        if (rs.next()) {
+            String contraseñaBD = rs.getString("CONTRASEÑA");
+            
+            if (!contraseñaActual.equals(contraseñaBD)) {
+                JOptionPane.showMessageDialog(this, "La contraseña actual no es correcta", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        rs.close();
+        pstVerificar.close();
+        
+        // 2. Actualizar la contraseña
+        String sqlActualizar = "UPDATE USUARIOS SET CONTRASEÑA = ? WHERE ID = ?";
+        PreparedStatement pstActualizar = conexion.prepareStatement(sqlActualizar);
+        pstActualizar.setString(1, nuevaContraseña);
+        pstActualizar.setString(2, this.idUsuario);
+        
+        int filasAfectadas = pstActualizar.executeUpdate();
+        if (filasAfectadas > 0) {
+            JOptionPane.showMessageDialog(this, "Contraseña actualizada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            // Limpiar campos después de éxito
+            limpiarCamposContraseña();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo actualizar la contraseña", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        pstActualizar.close();
+        conexion.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al actualizar la contraseña: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+              // TODO add your handling code here:
     }//GEN-LAST:event_con_guardarActionPerformed
 
     private void u_guardar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_u_guardar1ActionPerformed
+                                           
+        String nuevoNombre = u_nombre.getText().trim();
+        String nuevoApellido = u_apellido.getText().trim();
+        String nuevoCorreo = u_correo.getText().trim();
+        String nuevoCampus = campus.getSelectedItem().toString();
+        
+        // Validación de campos
+        if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoCorreo.isEmpty() || 
+            nuevoCampus.equals("SELECCIONAR")) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        Connection conexion = CONEXION.conectar();
+        if (conexion == null) {
+            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String sql = "UPDATE USUARIOS SET NOMBRE = ?, APELLIDO = ?, CORREO = ?, CAMPUS = ? WHERE ID = ?";
+        
+        try {
+            PreparedStatement pst = conexion.prepareStatement(sql);
+            pst.setString(1, nuevoNombre);
+            pst.setString(2, nuevoApellido);
+            pst.setString(3, nuevoCorreo);
+            pst.setString(4, nuevoCampus);
+            pst.setString(5, this.idUsuario);
+            
+            int filasAfectadas = pst.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(this, "Datos actualizados correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            pst.close();
+            conexion.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_u_guardar1ActionPerformed
 

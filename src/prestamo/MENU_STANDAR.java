@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 public class MENU_STANDAR extends javax.swing.JFrame {
      // Asegurar que está declarado como variable de clase
     private String correoUsuario;
+    private String nombreUsuario;
     public MENU_STANDAR() {
         initComponents();
         setTitle("Menú Principal");
@@ -22,6 +23,47 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     
     // Configuración de botones
     configureButtons();
+    
+    // Configurar el label de cerrar sesión
+    configurarCerrarSesion(); // <-- Añade esta línea
+}
+    // En tu clase MENU_STANDAR, añade este método
+private void configurarCerrarSesion() {
+    // Configurar el JLabel cerrar para que actúe como un botón
+    cerrar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambia el cursor
+    cerrar.setForeground(Color.WHITE); // Asegurar que sea visible
+    
+    // Añadir el MouseListener
+    cerrar.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            cerrarSesion();
+        }
+        
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            cerrar.setForeground(Color.RED); // Cambia color al pasar el mouse
+        }
+        
+        @Override
+        public void mouseExited(MouseEvent e) {
+            cerrar.setForeground(Color.WHITE); // Vuelve al color original
+        }
+    });
+}
+
+private void cerrarSesion() {
+    int confirmacion = JOptionPane.showConfirmDialog(
+        this, 
+        "¿Estás seguro que deseas cerrar sesión?", 
+        "Cerrar sesión", 
+        JOptionPane.YES_NO_OPTION
+    );
+    
+    if (confirmacion == JOptionPane.YES_OPTION) {
+        this.dispose(); // Cierra la ventana actual
+        new LOGIN().setVisible(true); // Abre la ventana de login
+    }
 }
     public void setNombreUsuario(String nombreUsuario) {
     nombre.setText(nombreUsuario);
@@ -70,12 +112,13 @@ public class MENU_STANDAR extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 PERFIL perfilPanel = new PERFIL();
                 // Pasar ambos datos al panel PERFIL
-                perfilPanel.setDatosUsuario(nombre.getText(), correoUsuario);
+                perfilPanel.cargarDatosUsuario(nombreUsuario, correoUsuario);
                 mostrarPanel(perfilPanel);
             }
         });
     }
     public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
+        this.nombreUsuario = nombreUsuario;
         this.correoUsuario = correoUsuario;
         nombre.setText(nombreUsuario);
         nombre.setForeground(Color.WHITE);
@@ -92,6 +135,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        cerrar = new javax.swing.JLabel();
         nombre = new javax.swing.JLabel();
         bienvenido = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -112,20 +156,23 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        nombre.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 20, 270, 30));
+        cerrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/cerrar-sesion54 .png"))); // NOI18N
+        jPanel1.add(cerrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 4, -1, -1));
 
-        bienvenido.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        nombre.setFont(new java.awt.Font("Arial", 1, 20)); // NOI18N
+        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 20, 270, 30));
+
+        bienvenido.setFont(new java.awt.Font("Arial", 1, 20)); // NOI18N
         bienvenido.setForeground(new java.awt.Color(255, 255, 255));
         bienvenido.setText("BIENVENIDO:");
-        jPanel1.add(bienvenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 20, 130, 30));
+        jPanel1.add(bienvenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 20, 130, 30));
 
         jLabel2.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("SISTEMA DE PRESTAMO ");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 0, 300, 70));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 0, 300, 70));
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 400, 40, 50));
@@ -249,6 +296,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bienvenido;
+    private javax.swing.JLabel cerrar;
     private javax.swing.JPanel contenedor;
     private javax.swing.JButton equipos;
     private javax.swing.JLabel jLabel1;
