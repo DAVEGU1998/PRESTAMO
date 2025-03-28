@@ -1,8 +1,14 @@
 package prestamo;
 import CONEXION.CONEXION;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +21,7 @@ public class LOGIN extends javax.swing.JFrame {
     
     public LOGIN() {
         initComponents();
+         setTitle("LOGIN");
         setPlaceholderText(USUARIO, "Correo");
         setPasswordFieldPlaceholder(CONTRASEÑA, "Contraseña");
         setResizable(false);
@@ -34,8 +41,9 @@ public class LOGIN extends javax.swing.JFrame {
                 validarUsuario();
             }
         });
+    configurarLabelRegistro();
     }
-
+    
     private void validarUsuario() {
     String correo = USUARIO.getText().trim();
     String contraseña = new String(CONTRASEÑA.getPassword()).trim();
@@ -120,6 +128,48 @@ public class LOGIN extends javax.swing.JFrame {
             }
         });
     }
+         private void configurarLabelRegistro() {
+        // Configurar el JLabel registrarse para que actúe como un botón
+        registrarse.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        registrarse.setForeground(Color.BLUE);
+        
+        // Añadir el MouseListener
+        registrarse.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                abrirVentanaRegistro();
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                registrarse.setForeground(new Color(0, 0, 200)); // Azul más oscuro
+                registrarse.setText("<html><u>Registrarse</u></html>"); // Subrayado
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                registrarse.setForeground(Color.BLUE);
+                registrarse.setText("Registrarse"); // Quita el subrayado
+            }
+        });
+    }
+
+    private void abrirVentanaRegistro() {
+        this.dispose(); // Cierra completamente LOGIN
+        REGISTRO registro = new REGISTRO();
+        registro.setVisible(true);
+        registro.setLocationRelativeTo(null); // Centrar la ventana
+        
+        // Opcional: Al cerrar REGISTRO, abrir nuevo LOGIN
+        registro.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                new LOGIN().setVisible(true);
+            }
+        });
+
+    }
+    
 
     @SuppressWarnings("unchecked")
     
@@ -129,7 +179,7 @@ public class LOGIN extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         USUARIO = new javax.swing.JTextField();
         CONTRASEÑA = new javax.swing.JPasswordField();
-        OLVIDE = new javax.swing.JLabel();
+        registrarse = new javax.swing.JLabel();
         OLVIDE1 = new javax.swing.JLabel();
         INGRESAR = new javax.swing.JToggleButton();
         ICON = new javax.swing.JLabel();
@@ -157,15 +207,15 @@ public class LOGIN extends javax.swing.JFrame {
         CONTRASEÑA.setText("jPasswordField1");
         jPanel1.add(CONTRASEÑA, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 420, 260, 40));
 
-        OLVIDE.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
-        OLVIDE.setForeground(new java.awt.Color(0, 51, 255));
-        OLVIDE.setText("Registrarse");
-        OLVIDE.addMouseListener(new java.awt.event.MouseAdapter() {
+        registrarse.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
+        registrarse.setForeground(new java.awt.Color(0, 51, 255));
+        registrarse.setText("Registrarse");
+        registrarse.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                OLVIDEMouseClicked(evt);
+                registrarseMouseClicked(evt);
             }
         });
-        jPanel1.add(OLVIDE, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 550, 80, 20));
+        jPanel1.add(registrarse, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 560, 80, 20));
 
         OLVIDE1.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
         OLVIDE1.setForeground(new java.awt.Color(0, 51, 255));
@@ -207,9 +257,9 @@ public class LOGIN extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void OLVIDEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OLVIDEMouseClicked
+    private void registrarseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registrarseMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_OLVIDEMouseClicked
+    }//GEN-LAST:event_registrarseMouseClicked
 
     private void OLVIDE1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OLVIDE1MouseClicked
         // TODO add your handling code here:
@@ -242,10 +292,10 @@ public class LOGIN extends javax.swing.JFrame {
     private javax.swing.JLabel FONDO2;
     private javax.swing.JLabel ICON;
     private javax.swing.JToggleButton INGRESAR;
-    private javax.swing.JLabel OLVIDE;
     private javax.swing.JLabel OLVIDE1;
     private javax.swing.JTextField USUARIO;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel registrarse;
     // End of variables declaration//GEN-END:variables
 }
 

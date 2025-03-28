@@ -17,6 +17,7 @@ public class PERFIL extends JPanel {
     }
     public PERFIL() {
         initComponents();
+       
         setPreferredSize(new Dimension(980, 710));
     
     // Configurar el checkbox
@@ -199,6 +200,7 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
         jPanel1.add(campus, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 290, 210, 40));
 
         u_correo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        u_correo.setEnabled(false);
         jPanel1.add(u_correo, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 290, 210, 40));
 
         u_nombre.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N

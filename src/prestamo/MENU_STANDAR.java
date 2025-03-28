@@ -13,7 +13,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
     private String nombreUsuario;
     public MENU_STANDAR() {
         initComponents();
-        setTitle("Menú Principal");
+        setTitle("MENU PRINCIPAL");
         setSize(1164, 779);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
