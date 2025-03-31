@@ -14,6 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.*;
+import prestamo.MENU_STANDAR;
+import prestamo.OLVIDE;
+import prestamo.REGISTRO;
 
 public class LOGIN extends javax.swing.JFrame {
     // Declaración de componentes
@@ -42,6 +45,7 @@ public class LOGIN extends javax.swing.JFrame {
             }
         });
     configurarLabelRegistro();
+    configurarLabelOlvide();
     }
     
     private void validarUsuario() {
@@ -169,7 +173,50 @@ public class LOGIN extends javax.swing.JFrame {
         });
 
     }
+    private void configurarLabelOlvide() {
+        OLVIDE.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        OLVIDE.setForeground(Color.BLUE);
     
+    // Si necesitas cambiar el texto inicial
+         // O el texto que prefieras
+    
+    // Configuración del MouseListener
+        OLVIDE.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+              // Para depuración
+            abrirVentanaOlvide();
+        }
+        
+        @Override
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            OLVIDE.setForeground(new Color(0, 0, 200));
+            OLVIDE.setText("<html><u>Olvide la contraseña.</u></html>");
+        }
+        
+        @Override
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            OLVIDE.setForeground(Color.BLUE);
+            OLVIDE.setText("Olvide la contraseña.");
+        }
+    });
+}
+    
+    private void abrirVentanaOlvide() {
+        this.dispose(); // Cierra completamente LOGIN
+        OLVIDE olvide = new OLVIDE();
+        olvide.setVisible(true);
+        olvide.setLocationRelativeTo(null);
+        
+        // Al cerrar OLVIDE, volver a LOGIN
+        olvide.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                new LOGIN().setVisible(true);
+            }
+        });
+    }
+
 
     @SuppressWarnings("unchecked")
     
@@ -180,7 +227,7 @@ public class LOGIN extends javax.swing.JFrame {
         USUARIO = new javax.swing.JTextField();
         CONTRASEÑA = new javax.swing.JPasswordField();
         registrarse = new javax.swing.JLabel();
-        OLVIDE1 = new javax.swing.JLabel();
+        OLVIDE = new javax.swing.JLabel();
         INGRESAR = new javax.swing.JToggleButton();
         ICON = new javax.swing.JLabel();
         FONDO2 = new javax.swing.JLabel();
@@ -205,6 +252,11 @@ public class LOGIN extends javax.swing.JFrame {
         jPanel1.add(USUARIO, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 360, 260, 40));
 
         CONTRASEÑA.setText("jPasswordField1");
+        CONTRASEÑA.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                CONTRASEÑAKeyTyped(evt);
+            }
+        });
         jPanel1.add(CONTRASEÑA, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 420, 260, 40));
 
         registrarse.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
@@ -217,15 +269,15 @@ public class LOGIN extends javax.swing.JFrame {
         });
         jPanel1.add(registrarse, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 560, 80, 20));
 
-        OLVIDE1.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
-        OLVIDE1.setForeground(new java.awt.Color(0, 51, 255));
-        OLVIDE1.setText("Olvide la contraseña.");
-        OLVIDE1.addMouseListener(new java.awt.event.MouseAdapter() {
+        OLVIDE.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
+        OLVIDE.setForeground(new java.awt.Color(0, 51, 255));
+        OLVIDE.setText("Olvide la contraseña.");
+        OLVIDE.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                OLVIDE1MouseClicked(evt);
+                OLVIDEMouseClicked(evt);
             }
         });
-        jPanel1.add(OLVIDE1, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 460, 130, 20));
+        jPanel1.add(OLVIDE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 460, 130, 20));
 
         INGRESAR.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         INGRESAR.setText("INGRESAR");
@@ -261,9 +313,9 @@ public class LOGIN extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_registrarseMouseClicked
 
-    private void OLVIDE1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OLVIDE1MouseClicked
+    private void OLVIDEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OLVIDEMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_OLVIDE1MouseClicked
+    }//GEN-LAST:event_OLVIDEMouseClicked
 
     private void USUARIOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_USUARIOActionPerformed
         // TODO add your handling code here:
@@ -272,9 +324,16 @@ public class LOGIN extends javax.swing.JFrame {
     private void USUARIOKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_USUARIOKeyTyped
     char c = evt.getKeyChar();
     // Aceptar solo letras mayúsculas y espacios
-    if (USUARIO.getText().length ()>=20) 
+    if (USUARIO.getText().length ()>=30) 
             evt.consume();     // TODO add your handling code here:
     }//GEN-LAST:event_USUARIOKeyTyped
+
+    private void CONTRASEÑAKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CONTRASEÑAKeyTyped
+    char c = evt.getKeyChar();
+    // Aceptar solo letras mayúsculas y espacios
+    if (USUARIO.getText().length ()>=30) 
+            evt.consume();     // TODO add your handling code here:
+    }//GEN-LAST:event_CONTRASEÑAKeyTyped
 
     /**
      * @param args the command line arguments
@@ -292,7 +351,7 @@ public class LOGIN extends javax.swing.JFrame {
     private javax.swing.JLabel FONDO2;
     private javax.swing.JLabel ICON;
     private javax.swing.JToggleButton INGRESAR;
-    private javax.swing.JLabel OLVIDE1;
+    private javax.swing.JLabel OLVIDE;
     private javax.swing.JTextField USUARIO;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel registrarse;

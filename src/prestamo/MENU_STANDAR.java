@@ -16,6 +16,7 @@ public class MENU_STANDAR extends javax.swing.JFrame {
         setTitle("MENU PRINCIPAL");
         setSize(1164, 779);
         setLocationRelativeTo(null);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
     // Configuración inicial del contenedor

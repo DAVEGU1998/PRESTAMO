@@ -1,47 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package prestamo;
 
-import java.net.PasswordAuthentication;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-import oracle.jdbc.driver.Message;
-import prestamo.LOGIN;
-import java.util.Properties;
-import javax.swing.*;
-import java.util.Properties;
-import javax.mail.AuthenticationFailedException;
-import javax.mail.Authenticator;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-/**
- *
- * @author ADMIN
- */
 public class REGISTRO extends javax.swing.JFrame {
-    // ... (tus componentes existentes)
-    
+    // Componentes del formulario (nombres EXACTOS como en NetBeans)
+     // Nombre exacto del diseñador
+
     public REGISTRO() {
         initComponents();
         setTitle("Solicitud de Registro");
         setLocationRelativeTo(null);
-        
-        // Configurar botones
-        solicitar.addActionListener(e -> enviarSolicitud());
-        cancelar.addActionListener(e -> volverALogin());
-        
+        configurarComponentes();
+    }
+
+    private void configurarComponentes() {
         // Configurar JComboBox
         tipo_usuario.setModel(new DefaultComboBoxModel<>(new String[] {
             "Seleccionar", "Estudiante", "Docente", "Administrativo"
@@ -50,109 +27,120 @@ public class REGISTRO extends javax.swing.JFrame {
         campus.setModel(new DefaultComboBoxModel<>(new String[] {
             "Seleccionar", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA"
         }));
+
+        // Configurar botones
+        solicitar.addActionListener(e -> enviarSolicitud());
+        cancelar.addActionListener(e -> volverALogin());
     }
-    
+
     private void enviarSolicitud() {
-        // Validar campos
         if (!validarCampos()) {
             return;
         }
         
-        // Obtener datos del formulario
         String datosUsuario = obtenerDatosFormulario();
         
-        // Enviar correo
         if (enviarCorreo(datosUsuario)) {
             JOptionPane.showMessageDialog(this, 
-                "Solicitud enviada correctamente. Revisa tu correo en un lapso de 24 horas para recibir tu usuario y contraseña.", 
+                "Solicitud enviada. Revisa tu correo en 24 horas.", 
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
             volverALogin();
         } else {
             JOptionPane.showMessageDialog(this, 
-                "Error al enviar la solicitud. Por favor intente nuevamente.", 
+                "Error al enviar la solicitud.", 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private boolean validarCampos() {
-        if (nombre.getText().trim().isEmpty() ||
-            apellido.getText().trim().isEmpty() ||
-            cedula.getText().trim().isEmpty() ||
-            correo.getText().trim().isEmpty() ||
-            tipo_usuario.getSelectedIndex() == 0 ||
-            campus.getSelectedIndex() == 0) {
-            
-            JOptionPane.showMessageDialog(this, 
-                "Todos los campos son obligatorios", 
-                "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+        StringBuilder errores = new StringBuilder();
         
-        // Validar formato de correo
-        if (!correo.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+        if (nombre.getText().trim().isEmpty()) errores.append("- Nombre\n");
+        if (apellido.getText().trim().isEmpty()) errores.append("- Apellido\n");
+        if (cedula.getText().trim().isEmpty()) errores.append("- Cédula\n");
+        if (correo.getText().trim().isEmpty()) errores.append("- Correo\n");
+        if (tipo_usuario.getSelectedIndex() == 0) errores.append("- Tipo de usuario\n");
+        if (campus.getSelectedIndex() == 0) errores.append("- Campus\n");
+        if (fecha_nac.getDate() == null) errores.append("- Fecha de nacimiento\n");
+        if (fecha_exp.getDate() == null) errores.append("- Fecha de expedición\n");
+
+        // Validación adicional de fechas
+        if (fecha_nac.getDate() != null && fecha_exp.getDate() != null && 
+            fecha_exp.getDate().before(fecha_nac.getDate())) {
+            errores.append("- La fecha de expedición no puede ser anterior a la de nacimiento\n");
+        }
+
+        if (!errores.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
-                "Ingrese un correo electrónico válido", 
+                "Complete todos los campos:\n" + errores.toString(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         
         return true;
     }
-    
+
     private String obtenerDatosFormulario() {
-        return "Nueva solicitud de registro para creacion de usuario:\n\n" +
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaNac = sdf.format(fecha_nac.getDate());
+        String fechaExp = sdf.format(fecha_exp.getDate());
+
+        return "SOLICITUD DE REGISTRO\n\n" +
                "Nombre: " + nombre.getText() + "\n" +
                "Apellido: " + apellido.getText() + "\n" +
                "Cédula: " + cedula.getText() + "\n" +
                "Correo: " + correo.getText() + "\n" +
-               "Tipo de usuario: " + tipo_usuario.getSelectedItem() + "\n" +
+               "Fecha Nacimiento: " + fechaNac + "\n" +
+               "Fecha Expedición: " + fechaExp + "\n" +
+               "Tipo Usuario: " + tipo_usuario.getSelectedItem() + "\n" +
                "Campus: " + campus.getSelectedItem();
     }
-    
-   private boolean enviarCorreo(String mensaje) {
-    final String host = "smtp.gmail.com";
-    final String usuario = "dvesga6@udi.edu.co";
-    final String contraseña = "avmk weex jckz aatl";
-    final String destinatario = "dvesga6@udi.edu.co";
 
-    Properties props = new Properties();
-    props.put("mail.smtp.auth", "true");
-    props.put("mail.smtp.starttls.enable", "true");
-    props.put("mail.smtp.host", host);
-    props.put("mail.smtp.port", "587");
-    props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-    props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+    private boolean enviarCorreo(String mensaje) {
+        final String host = "smtp.gmail.com";
+        final String usuario = "dvesga6@udi.edu.co";
+        final String contraseña = "avmk weex jckz aatl";
+        final String destinatario = "dvesga6@udi.edu.co";
 
-    try {
-        // SOLUCIÓN CLAVE: Usar referencia completa para Authenticator y PasswordAuthentication
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            @Override
-            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
-                return new javax.mail.PasswordAuthentication(usuario, contraseña);
-            }
-        });
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
-        javax.mail.internet.MimeMessage message = new javax.mail.internet.MimeMessage(session);
-        message.setFrom(new javax.mail.internet.InternetAddress(usuario));
-        message.addRecipient(javax.mail.Message.RecipientType.TO, 
-                          new javax.mail.internet.InternetAddress(destinatario));
-        message.setSubject("Nueva solicitud de registro - Sistema de Préstamos");
-        message.setText(mensaje);
+        try {
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(usuario, contraseña);
+                }
+            });
 
-        javax.mail.Transport.send(message);
-        return true;
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(usuario));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
+            message.setSubject("Nueva Solicitud de Registro");
+            message.setText(mensaje);
 
-    } catch (javax.mail.MessagingException e) {
-        JOptionPane.showMessageDialog(null, 
-            "Error al enviar correo: " + e.getMessage(), 
-            "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-        return false;
+            Transport.send(message);
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
+
     private void volverALogin() {
-        this.dispose(); // Cierra la ventana actual
-        new LOGIN().setVisible(true); // Abre la ventana de login
+        this.dispose();
+        new LOGIN().setVisible(true);
+    }
+
+    
+
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(() -> {
+            new REGISTRO().setVisible(true);
+        });
     }
 
     /**
@@ -185,6 +173,10 @@ public class REGISTRO extends javax.swing.JFrame {
         correo = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         campus = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        fecha_nac = new com.toedter.calendar.JDateChooser();
+        fecha_exp = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -221,30 +213,40 @@ public class REGISTRO extends javax.swing.JFrame {
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 210, 320, 40));
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel6.setText("Nombre");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 290, -1, -1));
+        jLabel6.setText("Nombres");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 270, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("Apellido");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 290, -1, -1));
+        jLabel7.setText("Apellidos");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 270, -1, -1));
 
         nombre.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 210, 40));
+        nombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                nombreKeyTyped(evt);
+            }
+        });
+        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 300, 210, 40));
 
         apellido.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 320, 210, 40));
+        apellido.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                apellidoKeyTyped(evt);
+            }
+        });
+        jPanel1.add(apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 300, 210, 40));
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel9.setText("Tipo de Usuario");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 550, -1, -1));
 
         tipo_usuario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         tipo_usuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "DOCENTE", "ADMINISTRATIVO" }));
-        jPanel1.add(tipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 500, 210, 40));
+        jPanel1.add(tipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 580, 210, 40));
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel10.setText("Campus");
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 470, -1, -1));
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 550, -1, -1));
 
         cancelar.setBackground(new java.awt.Color(0, 0, 0));
         cancelar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -255,7 +257,7 @@ public class REGISTRO extends javax.swing.JFrame {
                 cancelarActionPerformed(evt);
             }
         });
-        jPanel1.add(cancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 600, 160, 50));
+        jPanel1.add(cancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 660, 160, 50));
 
         solicitar.setBackground(new java.awt.Color(0, 0, 0));
         solicitar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -266,25 +268,45 @@ public class REGISTRO extends javax.swing.JFrame {
                 solicitarActionPerformed(evt);
             }
         });
-        jPanel1.add(solicitar, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 600, 160, 50));
+        jPanel1.add(solicitar, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 660, 160, 50));
 
         cedula.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(cedula, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 410, 210, 40));
+        cedula.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                cedulaKeyTyped(evt);
+            }
+        });
+        jPanel1.add(cedula, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 210, 40));
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel12.setText("Cedula");
-        jPanel1.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 380, -1, -1));
+        jPanel1.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 360, -1, -1));
 
         correo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(correo, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 410, 210, 40));
+        correo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                correoKeyTyped(evt);
+            }
+        });
+        jPanel1.add(correo, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 490, 210, 40));
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel13.setText("Correo");
-        jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 380, -1, -1));
+        jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 460, -1, -1));
 
         campus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         campus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
-        jPanel1.add(campus, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 500, 210, 40));
+        jPanel1.add(campus, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 580, 210, 40));
+
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel14.setText("Fecha de expedicion");
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, -1, -1));
+
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel15.setText("Fecha de nacimiento");
+        jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 460, -1, -1));
+        jPanel1.add(fecha_nac, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, 210, 40));
+        jPanel1.add(fecha_exp, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 390, 210, 40));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -294,7 +316,9 @@ public class REGISTRO extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 749, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -311,6 +335,35 @@ public class REGISTRO extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_solicitarActionPerformed
 
+    private void nombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nombreKeyTyped
+        char c = evt.getKeyChar();
+        // Aceptar solo letras mayúsculas y espacios
+        if (nombre.getText().length ()>=30) 
+                evt.consume();        // TODO add your handling code here:
+    }//GEN-LAST:event_nombreKeyTyped
+
+    private void apellidoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apellidoKeyTyped
+        char c = evt.getKeyChar();
+        // Aceptar solo letras mayúsculas y espacios
+        if (apellido.getText().length ()>=30) 
+                evt.consume();        // TODO add your handling code here:
+    }//GEN-LAST:event_apellidoKeyTyped
+
+    private void cedulaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cedulaKeyTyped
+        char c = evt.getKeyChar();
+        // Aceptar solo letras mayúsculas y espacios
+        if (cedula.getText().length ()>=10) 
+                evt.consume();  
+                if (c<'0' || c>'9') evt.consume();// TODO add your handling code here:
+    }//GEN-LAST:event_cedulaKeyTyped
+
+    private void correoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correoKeyTyped
+    char c = evt.getKeyChar();
+        // Aceptar solo letras mayúsculas y espacios
+        if (correo.getText().length ()>=30) 
+                evt.consume();        // TODO add your handling code here:
+    }//GEN-LAST:event_correoKeyTyped
+
     /**
      * @param args the command line arguments
      */
@@ -322,10 +375,14 @@ public class REGISTRO extends javax.swing.JFrame {
     private javax.swing.JButton cancelar;
     private javax.swing.JTextField cedula;
     private javax.swing.JTextField correo;
+    private com.toedter.calendar.JDateChooser fecha_exp;
+    private com.toedter.calendar.JDateChooser fecha_nac;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
