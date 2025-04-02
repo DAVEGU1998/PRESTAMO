@@ -63,8 +63,8 @@ public class LOGIN extends javax.swing.JFrame {
         return;
     }
 
-    // Consulta modificada para obtener nombre y correo
-    String sql = "SELECT NOMBRE, CORREO FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
+    // Consulta modificada para obtener nombre, correo y tipo de usuario
+    String sql = "SELECT NOMBRE, CORREO, TIPO_USUARIO FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
     try {
         PreparedStatement pst = conexion.prepareStatement(sql);
         pst.setString(1, correo);
@@ -73,13 +73,22 @@ public class LOGIN extends javax.swing.JFrame {
         ResultSet rs = pst.executeQuery();
         if (rs.next()) {
             String nombreUsuario = rs.getString("NOMBRE");
-            String correoUsuario = rs.getString("CORREO"); // Obtenemos el correo
+            String correoUsuario = rs.getString("CORREO");
+            String tipoUsuario = rs.getString("TIPO_USUARIO");
 
             this.dispose();
 
-            MENU_STANDAR menu = new MENU_STANDAR();
-            menu.setDatosUsuario(nombreUsuario, correoUsuario); // Pasamos ambos datos
-            menu.setVisible(true);
+            // Redireccionar según el tipo de usuario
+            if ("ADMINISTRADOR".equalsIgnoreCase(tipoUsuario)) {
+                MENU_ADMIN menuAdmin = new MENU_ADMIN();
+                menuAdmin.setDatosUsuario(nombreUsuario, correoUsuario);
+                menuAdmin.setVisible(true);
+            } else {
+                // Por defecto o para DOCENTE
+                MENU_STANDAR menuStandar = new MENU_STANDAR();
+                menuStandar.setDatosUsuario(nombreUsuario, correoUsuario);
+                menuStandar.setVisible(true);
+            }
 
         } else {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);

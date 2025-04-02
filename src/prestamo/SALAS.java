@@ -8,14 +8,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PERFIL extends JPanel {
+public class SALAS extends JPanel {
     private String idUsuario; // Para almacenar el ID del usuario
     private JCheckBox mostrarContraseña;
     private void limpiarCamposContraseña() {
         con_actual.setText("");
         con_nueva.setText("");
     }
-    public PERFIL() {
+    public SALAS() {
         initComponents();
        
         setPreferredSize(new Dimension(980, 710));
@@ -241,7 +241,9 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 671, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 671, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

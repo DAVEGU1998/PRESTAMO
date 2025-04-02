@@ -6,13 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import prestamo.EQUIPOS;
 
-public class MENU_STANDAR extends javax.swing.JFrame {
+public class MENU_ADMIN extends javax.swing.JFrame {
      // Asegurar que está declarado como variable de clase
     private String correoUsuario;
     private String nombreUsuario;
-    public MENU_STANDAR() {
+    public MENU_ADMIN() {
         initComponents();
         setTitle("MENU PRINCIPAL");
         setSize(1164, 779);
@@ -75,7 +74,7 @@ private void cerrarSesion() {
 }
 
    private void configureButtons() {
-    JButton[] buttons = {perfil, salas, equipos, pqrs};
+    JButton[] buttons = {perfil, salas, equipos, usuarios, inventario, REPORTES};
     
     // Hacer botones transparentes
     for (JButton button : buttons) {
@@ -126,8 +125,7 @@ private void cerrarSesion() {
             mostrarPanel(equiposPanel);
         }
     });
-}
-
+   }
     public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
         this.nombreUsuario = nombreUsuario;
         this.correoUsuario = correoUsuario;
@@ -141,11 +139,15 @@ private void cerrarSesion() {
     contenedor.revalidate();
     contenedor.repaint();
 }
-
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        REPORTES = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        inventario = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
         cerrar = new javax.swing.JLabel();
         nombre = new javax.swing.JLabel();
         bienvenido = new javax.swing.JLabel();
@@ -155,7 +157,7 @@ private void cerrarSesion() {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        pqrs = new javax.swing.JButton();
+        usuarios = new javax.swing.JButton();
         perfil = new javax.swing.JButton();
         equipos = new javax.swing.JButton();
         salas = new javax.swing.JButton();
@@ -166,6 +168,26 @@ private void cerrarSesion() {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        REPORTES.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        REPORTES.setText("REPORTES");
+        REPORTES.setBorder(null);
+        REPORTES.setBorderPainted(false);
+        REPORTES.setFocusable(false);
+        jPanel1.add(REPORTES, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
+
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 40, 50));
+
+        inventario.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        inventario.setText("INVENTARIO");
+        inventario.setBorder(null);
+        inventario.setBorderPainted(false);
+        inventario.setFocusable(false);
+        jPanel1.add(inventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 560, 140, 50));
+
+        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 560, 40, 50));
 
         cerrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/cerrar-sesion54 .png"))); // NOI18N
         jPanel1.add(cerrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 4, -1, -1));
@@ -186,7 +208,7 @@ private void cerrarSesion() {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 0, 300, 70));
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 400, 40, 50));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 480, 40, 50));
 
         jLabel1.setBackground(new java.awt.Color(0, 0, 0));
         jLabel1.setOpaque(true);
@@ -196,17 +218,17 @@ private void cerrarSesion() {
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 164, -1, 40));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/salas 32.png"))); // NOI18N
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 243, 40, 40));
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 330, 40, 40));
 
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/EQUIPOS 32.png"))); // NOI18N
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 320, 40, 50));
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 400, 40, 50));
 
-        pqrs.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        pqrs.setText("PQRS");
-        pqrs.setBorder(null);
-        pqrs.setBorderPainted(false);
-        pqrs.setFocusable(false);
-        jPanel1.add(pqrs, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 400, 140, 50));
+        usuarios.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        usuarios.setText("USUARIOS");
+        usuarios.setBorder(null);
+        usuarios.setBorderPainted(false);
+        usuarios.setFocusable(false);
+        jPanel1.add(usuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, 140, 50));
 
         perfil.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         perfil.setText("PERFIL");
@@ -223,13 +245,13 @@ private void cerrarSesion() {
         equipos.setText("EQUIPOS");
         equipos.setBorder(null);
         equipos.setBorderPainted(false);
-        jPanel1.add(equipos, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 140, 50));
+        jPanel1.add(equipos, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 400, 140, 50));
 
         salas.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         salas.setText("SALAS");
         salas.setBorder(null);
         salas.setBorderPainted(false);
-        jPanel1.add(salas, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
+        jPanel1.add(salas, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 140, 50));
 
         jLabel3.setBackground(new java.awt.Color(102, 153, 255));
         jLabel3.setOpaque(true);
@@ -287,29 +309,32 @@ private void cerrarSesion() {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MENU_STANDAR.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MENU_ADMIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MENU_STANDAR.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MENU_ADMIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MENU_STANDAR.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MENU_ADMIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MENU_STANDAR.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MENU_ADMIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MENU_STANDAR().setVisible(true);
+                new MENU_ADMIN().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton REPORTES;
     private javax.swing.JLabel bienvenido;
     private javax.swing.JLabel cerrar;
     private javax.swing.JPanel contenedor;
     private javax.swing.JButton equipos;
+    private javax.swing.JButton inventario;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -317,11 +342,13 @@ private void cerrarSesion() {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel nombre;
     private javax.swing.JButton perfil;
-    private javax.swing.JButton pqrs;
     private javax.swing.JButton salas;
+    private javax.swing.JButton usuarios;
     // End of variables declaration//GEN-END:variables
 
    
