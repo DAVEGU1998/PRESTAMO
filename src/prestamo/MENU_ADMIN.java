@@ -2,6 +2,7 @@ package prestamo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -13,6 +14,9 @@ public class MENU_ADMIN extends javax.swing.JFrame {
      // Asegurar que está declarado como variable de clase
     private String correoUsuario;
     private String nombreUsuario;
+    private Timer inactivityTimer;
+    private final int TIMEOUT = 5 * 60 * 1000; // 5 minutos en milisegundos
+
     public MENU_ADMIN() {
         initComponents();
         setTitle("MENU PRINCIPAL");
@@ -28,8 +32,44 @@ public class MENU_ADMIN extends javax.swing.JFrame {
     configureButtons();
     
     // Configurar el label de cerrar sesión
-    configurarCerrarSesion(); // <-- Añade esta línea
+    configurarCerrarSesion();
+    // Inicializa el detector de inactividad
+    iniciarDetectorInactividad();
+// <-- Añade esta línea
 }
+    private void iniciarDetectorInactividad() {
+    // Listener global para cualquier evento de entrada del usuario (mouse, teclado, etc.)
+    Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+        public void eventDispatched(AWTEvent event) {
+            reiniciarTemporizadorInactividad();
+        }
+    }, AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+
+    // Temporizador de inactividad
+    inactivityTimer = new Timer(TIMEOUT, new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            cerrarSesionPorInactividad();
+        }
+    });
+    inactivityTimer.setRepeats(false); // Solo una vez
+    inactivityTimer.start(); // Iniciar temporizador
+}
+
+private void reiniciarTemporizadorInactividad() {
+    if (inactivityTimer != null) {
+        inactivityTimer.restart();
+    }
+}
+
+private void cerrarSesionPorInactividad() {
+    JOptionPane.showMessageDialog(this, 
+        "Sesión cerrada por inactividad.", 
+        "Inactividad", 
+        JOptionPane.WARNING_MESSAGE);
+    this.dispose(); // Cierra la ventana actual
+    new LOGIN().setVisible(true); // Vuelve a la ventana de login
+}
+
     // En tu clase MENU_STANDAR, añade este método
 private void configurarCerrarSesion() {
     // Configurar el JLabel cerrar para que actúe como un botón
