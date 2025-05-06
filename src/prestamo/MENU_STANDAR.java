@@ -75,7 +75,7 @@ private void cerrarSesion() {
 }
 
    private void configureButtons() {
-    JButton[] buttons = {perfil, salas, equipos, pqrs};
+    JButton[] buttons = {perfil, salas, equipos, pqrs, reservas};
     
     // Hacer botones transparentes
     for (JButton button : buttons) {
@@ -85,6 +85,7 @@ private void cerrarSesion() {
         button.setFocusPainted(false);
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 16));
+    
     }
     
     // Efecto hover
@@ -107,7 +108,13 @@ private void cerrarSesion() {
             
         });
     }
-
+    reservas.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        RESERVAS reservasPanel = new RESERVAS();
+        mostrarPanel(reservasPanel);
+    }
+});
     // ✅ Agregar evento al botón "perfil" para cambiar de panel
     perfil.addActionListener(new ActionListener() {
             @Override
@@ -149,11 +156,11 @@ private void cerrarSesion() {
         cerrar = new javax.swing.JLabel();
         nombre = new javax.swing.JLabel();
         bienvenido = new javax.swing.JLabel();
-        reservas = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        reservas = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -180,12 +187,6 @@ private void cerrarSesion() {
         bienvenido.setText("BIENVENIDO:");
         jPanel1.add(bienvenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 20, 130, 30));
 
-        reservas.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        reservas.setText("RESERVAS");
-        reservas.setBorder(null);
-        reservas.setBorderPainted(false);
-        jPanel1.add(reservas, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
-
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/salas 32.png"))); // NOI18N
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 40, 40));
 
@@ -202,6 +203,17 @@ private void cerrarSesion() {
         jLabel1.setBackground(new java.awt.Color(0, 0, 0));
         jLabel1.setOpaque(true);
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1160, 70));
+
+        reservas.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        reservas.setText("RESERVAS");
+        reservas.setBorder(null);
+        reservas.setBorderPainted(false);
+        reservas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reservasActionPerformed(evt);
+            }
+        });
+        jPanel1.add(reservas, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/perfil32.png"))); // NOI18N
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 164, -1, 40));
@@ -280,6 +292,10 @@ private void cerrarSesion() {
     
         // TODO add your handling code here:
     }//GEN-LAST:event_perfilActionPerformed
+
+    private void reservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reservasActionPerformed
 
     /**
      * @param args the command line arguments

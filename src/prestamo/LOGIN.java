@@ -63,8 +63,8 @@ public class LOGIN extends javax.swing.JFrame {
         return;
     }
 
-    // Consulta modificada para obtener nombre, correo y tipo de usuario
-    String sql = "SELECT NOMBRE, CORREO, TIPO_USUARIO FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
+    // Consulta modificada para obtener nombre, correo, tipo de usuario y estado
+    String sql = "SELECT NOMBRE, CORREO, TIPO_USUARIO, ESTADO FROM USUARIOS WHERE CORREO = ? AND CONTRASEÑA = ?";
     try {
         PreparedStatement pst = conexion.prepareStatement(sql);
         pst.setString(1, correo);
@@ -75,19 +75,26 @@ public class LOGIN extends javax.swing.JFrame {
             String nombreUsuario = rs.getString("NOMBRE");
             String correoUsuario = rs.getString("CORREO");
             String tipoUsuario = rs.getString("TIPO_USUARIO");
+            String estado = rs.getString("ESTADO");
 
-            this.dispose();
+            // Verificar si el usuario está activo
+            if ("ACTIVO".equalsIgnoreCase(estado)) {
+                this.dispose(); // Cierra el formulario de login
 
-            // Redireccionar según el tipo de usuario
-            if ("ADMINISTRADOR".equalsIgnoreCase(tipoUsuario)) {
-                MENU_ADMIN menuAdmin = new MENU_ADMIN();
-                menuAdmin.setDatosUsuario(nombreUsuario, correoUsuario);
-                menuAdmin.setVisible(true);
+                // Redireccionar según el tipo de usuario
+                if ("ADMINISTRADOR".equalsIgnoreCase(tipoUsuario)) {
+                    MENU_ADMIN menuAdmin = new MENU_ADMIN();
+                    menuAdmin.setDatosUsuario(nombreUsuario, correoUsuario);
+                    menuAdmin.setVisible(true);
+                } else {
+                    // Por defecto o para DOCENTE
+                    MENU_STANDAR menuStandar = new MENU_STANDAR();
+                    menuStandar.setDatosUsuario(nombreUsuario, correoUsuario);
+                    menuStandar.setVisible(true);
+                }
             } else {
-                // Por defecto o para DOCENTE
-                MENU_STANDAR menuStandar = new MENU_STANDAR();
-                menuStandar.setDatosUsuario(nombreUsuario, correoUsuario);
-                menuStandar.setVisible(true);
+                // El usuario está inactivo
+                JOptionPane.showMessageDialog(this, "El usuario está inactivo. Por favor, póngase en contacto con soporte técnico.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
             }
 
         } else {
@@ -102,6 +109,7 @@ public class LOGIN extends javax.swing.JFrame {
         e.printStackTrace();
     }
 }
+
 
     private void setPlaceholderText(JTextField field, String placeholder) {
         field.setText(placeholder);

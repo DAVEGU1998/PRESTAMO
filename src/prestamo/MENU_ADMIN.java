@@ -77,7 +77,7 @@ private void cerrarSesion() {
 }
 
    private void configureButtons() {
-    JButton[] buttons = {perfil, salas, equipos, usuarios, RECURSOS, PRESTAMO};
+    JButton[] buttons = {perfil, salas, equipos, usuarios, RECURSOS, RESERVAS};
     
     // Hacer botones transparentes
     for (JButton button : buttons) {
@@ -109,7 +109,7 @@ private void cerrarSesion() {
             
         });
     }
-    PRESTAMO.addActionListener(new ActionListener() {
+    RESERVAS.addActionListener(new ActionListener() {
     @Override
     public void actionPerformed(ActionEvent e) {
         RESERVAS reservasPanel = new RESERVAS();
@@ -172,7 +172,7 @@ private void cerrarSesion() {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        PRESTAMO = new javax.swing.JButton();
+        RESERVAS = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         RECURSOS = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
@@ -197,17 +197,17 @@ private void cerrarSesion() {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        PRESTAMO.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        PRESTAMO.setText("PRESTAMO");
-        PRESTAMO.setBorder(null);
-        PRESTAMO.setBorderPainted(false);
-        PRESTAMO.setFocusable(false);
-        PRESTAMO.addActionListener(new java.awt.event.ActionListener() {
+        RESERVAS.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        RESERVAS.setText("RESERVAS");
+        RESERVAS.setBorder(null);
+        RESERVAS.setBorderPainted(false);
+        RESERVAS.setFocusable(false);
+        RESERVAS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PRESTAMOActionPerformed(evt);
+                RESERVASActionPerformed(evt);
             }
         });
-        jPanel1.add(PRESTAMO, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
+        jPanel1.add(RESERVAS, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 140, 50));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/PQR32.png"))); // NOI18N
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 40, 50));
@@ -334,9 +334,9 @@ private void cerrarSesion() {
         // TODO add your handling code here:
     }//GEN-LAST:event_equiposActionPerformed
 
-    private void PRESTAMOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PRESTAMOActionPerformed
+    private void RESERVASActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RESERVASActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_PRESTAMOActionPerformed
+    }//GEN-LAST:event_RESERVASActionPerformed
 
     /**
      * @param args the command line arguments
@@ -375,8 +375,8 @@ private void cerrarSesion() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton PRESTAMO;
     private javax.swing.JButton RECURSOS;
+    private javax.swing.JButton RESERVAS;
     private javax.swing.JLabel bienvenido;
     private javax.swing.JLabel cerrar;
     private javax.swing.JPanel contenedor;
