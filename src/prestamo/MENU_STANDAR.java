@@ -222,7 +222,7 @@ private void cerrarSesionPorInactividad() {
         jPanel1.add(cerrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 4, -1, -1));
 
         nombre.setFont(new java.awt.Font("Arial", 1, 20)); // NOI18N
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 20, 270, 30));
+        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 20, 260, 30));
 
         bienvenido.setFont(new java.awt.Font("Arial", 1, 20)); // NOI18N
         bienvenido.setForeground(new java.awt.Color(255, 255, 255));

@@ -169,7 +169,7 @@ public class CREAR_USUARIOS extends javax.swing.JFrame  {
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
 
         tipo_usuario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        tipo_usuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "DOCENTE", "ADMINISTRATIVO" }));
+        tipo_usuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "DOCENTE", "ADMINISTRADOR" }));
         jPanel1.add(tipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 500, 210, 40));
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N

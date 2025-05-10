@@ -5,24 +5,26 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Vector;
 
-public class USUARIOS extends JPanel {
+public class RECURSOS extends JPanel {
    
     private DefaultTableModel model;
     private String[] columnNames;
     private Object oldValue; // Para almacenar el valor antes de editar
     
-    public USUARIOS() {
+    public RECURSOS() {
         initComponents();
         personalizarBotones();
+        
         configurarTabla();
         cargarDatos();
         
-        crear_usuario.addActionListener(new ActionListener() {
+        crear_recurso.addActionListener(new ActionListener() {
     public void actionPerformed(ActionEvent e) {
-        CREAR_USUARIOS crearUsuariosVentana = new CREAR_USUARIOS();
+        CREAR_RECURSOS crearUsuariosVentana = new CREAR_RECURSOS();
         crearUsuariosVentana.setVisible(true);
     }
 });
@@ -72,6 +74,7 @@ buscador.addFocusListener(new FocusListener() {
     }
     return -1; // Si no se encuentra
 }
+    
 private void personalizarBotones() {
     // Configuración común para todos los botones
     Font buttonFont = new Font("Segoe UI", Font.BOLD, 12);
@@ -94,14 +97,14 @@ private void personalizarBotones() {
     Eliminar.setCursor(new Cursor(Cursor.HAND_CURSOR));
     
     // Botón CREAR USUARIO
-    crear_usuario.setBackground(new Color(60, 180, 60));
-    crear_usuario.setForeground(textColor);
-    crear_usuario.setFont(buttonFont);
-    crear_usuario.setBorder(BorderFactory.createCompoundBorder(
+    crear_recurso.setBackground(new Color(60, 180, 60));
+    crear_recurso.setForeground(textColor);
+    crear_recurso.setFont(buttonFont);
+    crear_recurso.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(new Color(40, 140, 40)), 
         BorderFactory.createEmptyBorder(5, 10, 5, 10)
     ));
-    crear_usuario.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    crear_recurso.setCursor(new Cursor(Cursor.HAND_CURSOR));
     
     // Botón ACTIVAR/INACTIVO
     Inhabilitar.setBackground(new Color(255, 165, 0));
@@ -116,7 +119,7 @@ private void personalizarBotones() {
     // Añadir efectos hover a todos los botones
     agregarEfectoHover(buscar, new Color(51, 102, 255), new Color(0, 75, 255));
     agregarEfectoHover(Eliminar, new Color(255, 80, 80), new Color(255, 60, 60));
-    agregarEfectoHover(crear_usuario, new Color(60, 180, 60), new Color(40, 160, 40));
+    agregarEfectoHover(crear_recurso, new Color(60, 180, 60), new Color(40, 160, 40));
     agregarEfectoHover(Inhabilitar, new Color(255, 165, 0), new Color(255, 140, 0));
 }
 private void agregarEfectoHover(JButton button, Color normalColor, Color hoverColor) {
@@ -145,10 +148,10 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
                 return true; // Todas las celdas editables
             }
         };
-        USUARIOS.setModel(model);
+        RECURSOS.setModel(model);
         
         // Editor personalizado para manejar la confirmación
-        USUARIOS.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()) {
+        RECURSOS.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()) {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, 
                     boolean isSelected, int row, int column) {
@@ -162,11 +165,10 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
                 
                 // Si el valor cambió, pedir confirmación
                 if (!newValue.equals(oldValue)) {
-                    String columnName = columnNames[USUARIOS.getSelectedColumn()];
-                    String nombreUsuario = model.getValueAt(USUARIOS.getSelectedRow(), 1).toString(); // Asume columna 1 es nombre
+                    String columnName = columnNames[RECURSOS.getSelectedColumn()];
+                    String nombreUsuario = model.getValueAt(RECURSOS.getSelectedRow(), 1).toString(); // Asume columna 1 es nombre
                     
-                    int confirm = JOptionPane.showConfirmDialog(
-                        USUARIOS.this,
+                    int confirm = JOptionPane.showConfirmDialog(RECURSOS.this,
                         "¿Confirmar cambio para " + nombreUsuario + "?\n" +
                         "Campo: " + columnName + "\n" +
                         "De: " + oldValue + "\n" +
@@ -177,7 +179,8 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
                     if (confirm == JOptionPane.YES_OPTION) {
                         boolean result = super.stopCellEditing();
                         if (result) {
-                            actualizarEnBD(USUARIOS.getSelectedRow(), USUARIOS.getSelectedColumn(), newValue);
+                            actualizarEnBD(RECURSOS.getSelectedRow(), RECURSOS.getSelectedColumn(), newValue);
+                            
                         }
                         return result;
                     } else {
@@ -191,42 +194,35 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
         });
     }
     private void buscarUsuarios(String texto) {
-        System.out.println("Buscando: " + texto);
-    texto = texto.toLowerCase(); // Ignorar mayúsculas/minúsculas
+    texto = texto.toLowerCase();
     try (Connection conn = CONEXION.conectar();
          PreparedStatement pstmt = conn.prepareStatement(
-             "SELECT * FROM USUARIOS WHERE " +
-             "LOWER(NOMBRE) LIKE ? OR " +
-             "LOWER(APELLIDO) LIKE ? OR " +
-             "LOWER(CORREO) LIKE ? OR " +
-             "LOWER(TELEFONO) LIKE ? OR " +
-             "LOWER(TIPO_USUARIO) LIKE ? OR " +
-             "LOWER(CAMPUS) LIKE ? OR " +
-             "LOWER(CONTRASEÑA) LIKE ? OR " +
-             "LOWER(FECHA_NAC) LIKE ? OR " +
-             "LOWER(FECHA_EXP) LIKE ? OR " +
-             "LOWER(CEDULA) LIKE ? OR " +
-             "LOWER(ESTADO) LIKE ?")) {
+             "SELECT COLOR, MARCA, INVENTARIO, ESTADO, DESCRIPCION " +
+             "FROM EQUIPO WHERE " +
+             "LOWER(COLOR) LIKE ? OR " +
+             "LOWER(MARCA) LIKE ? OR " +
+             "INVENTARIO LIKE ? OR " +
+             "LOWER(ESTADO) LIKE ? OR " +
+             "LOWER(DESCRIPCION) LIKE ?")) {
 
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= 5; i++) {
             pstmt.setString(i, "%" + texto + "%");
         }
 
         ResultSet rs = pstmt.executeQuery();
-        ResultSetMetaData metaData = rs.getMetaData();
-        int columnCount = metaData.getColumnCount();
-
-        columnNames = new String[columnCount];
-        for (int i = 0; i < columnCount; i++) {
-            columnNames[i] = metaData.getColumnName(i + 1);
-        }
+        
+        // Usamos el mismo orden de columnas que en cargarDatos()
+        String[] columnasMostradas = {"INVENTARIO", "MARCA", "COLOR", "DESCRIPCION", "ESTADO"};
+        columnNames = columnasMostradas;
 
         Vector<Vector<Object>> data = new Vector<>();
         while (rs.next()) {
             Vector<Object> row = new Vector<>();
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(rs.getObject(i));
-            }
+            row.add(rs.getObject("INVENTARIO"));
+            row.add(rs.getObject("MARCA"));
+            row.add(rs.getObject("COLOR"));
+            row.add(rs.getObject("DESCRIPCION"));
+            row.add(rs.getObject("ESTADO"));
             data.add(row);
         }
 
@@ -237,7 +233,7 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
 
     } catch (SQLException ex) {
         JOptionPane.showMessageDialog(this,
-            "Error al buscar usuarios: " + ex.getMessage(),
+            "Error al buscar recursos: " + ex.getMessage(),
             "Error", JOptionPane.ERROR_MESSAGE);
         ex.printStackTrace();
     }
@@ -245,80 +241,139 @@ private void agregarEfectoHover(JButton button, Color normalColor, Color hoverCo
 
     
     public void cargarDatos() {
-        try (Connection conn = CONEXION.conectar();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM USUARIOS ORDER BY NOMBRE")) {
+    try (Connection conn = CONEXION.conectar();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT COLOR, MARCA, INVENTARIO, ESTADO, ID_RECURSO, DESCRIPCION, TIPO_RECURSO FROM EQUIPO ORDER BY INVENTARIO")) {
+        
+        ResultSetMetaData metaData = rs.getMetaData();
+        
+        // Definir manualmente el orden de las columnas que queremos mostrar
+        String[] columnasMostradas = {"TIPO_RECURSO","INVENTARIO", "MARCA", "COLOR", "DESCRIPCION", "ESTADO"};
+        columnNames = columnasMostradas;
+        
+        Vector<Vector<Object>> data = new Vector<>();
+        while (rs.next()) {
+            Vector<Object> row = new Vector<>();
+            // Orden correspondiente al SELECT: COLOR, MARCA, INVENTARIO, ESTADO, ID_RECURSO, DESCRIPCION
+            // Pero lo reordenamos según columnasMostradas
+            row.add(rs.getObject("TIPO_RECURSO"));         // ESTADO
+            row.add(rs.getObject("INVENTARIO"));    // INVENTARIO
+            row.add(rs.getObject("MARCA"));         // MARCA
+            row.add(rs.getObject("COLOR"));         // COLOR
+            row.add(rs.getObject("DESCRIPCION"));    // DESCRIPCION
             
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
+            row.add(rs.getObject("ESTADO"));         // ESTADO
             
-            columnNames = new String[columnCount];
-            for (int i = 0; i < columnCount; i++) {
-                columnNames[i] = metaData.getColumnName(i + 1);
-            }
+            // No agregamos ID_RECURSO a los datos mostrados
             
-            Vector<Vector<Object>> data = new Vector<>();
-            while (rs.next()) {
-                Vector<Object> row = new Vector<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    row.add(rs.getObject(i));
-                }
-                data.add(row);
-            }
-            
-            model.setDataVector(data, new Vector<String>() {{
-                for (String name : columnNames) add(name);
-            }});
-            
-            ajustarAnchoColumnas();
-            
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Error al cargar usuarios: " + ex.getMessage(), 
-                "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+            data.add(row);
         }
+        
+        model.setDataVector(data, new Vector<String>() {{
+            for (String name : columnNames) add(name);
+        }});
+        
+        ajustarAnchoColumnas();
+        
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, 
+            "Error al cargar recursos: " + ex.getMessage(), 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
     }
+}
     
     // Reemplaza TODO el método actualizarEnBD con este código
 private void actualizarEnBD(int row, int col, Object newValue) {
     String columnName = columnNames[col];
-    int cedulaIndex = obtenerIndiceColumna("CEDULA");
-    if (cedulaIndex == -1) {
-        JOptionPane.showMessageDialog(this, "No se encontró la columna 'CEDULA'", "Error", JOptionPane.ERROR_MESSAGE);
+    Object numeroInventario = model.getValueAt(row, 1); // Columna INVENTARIO (2da columna)
+
+    // Si estás intentando actualizar la columna INVENTARIO
+    if (col == 1) {
+        try {
+            // Asegurarse de que el nuevo valor sea un número válido
+            int nuevoInventario = Integer.parseInt(newValue.toString());
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    try (Connection conn = CONEXION.conectar();
+                         PreparedStatement pstmt = conn.prepareStatement(
+                             "UPDATE EQUIPO SET INVENTARIO = ? WHERE INVENTARIO = ?")) {
+
+                        // Establecer el nuevo y el antiguo valor
+                        pstmt.setInt(1, nuevoInventario);
+                        pstmt.setInt(2, Integer.parseInt(numeroInventario.toString()));
+
+                        int affectedRows = pstmt.executeUpdate();
+
+                        SwingUtilities.invokeLater(() -> {
+                            if (affectedRows > 0) {
+                                JOptionPane.showMessageDialog(RECURSOS.this,
+                                    "¡Recurso actualizado correctamente!",
+                                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                model.setValueAt(oldValue, row, col);
+                                JOptionPane.showMessageDialog(RECURSOS.this,
+                                    "No se pudo actualizar el recurso",
+                                    "Error", JOptionPane.WARNING_MESSAGE);
+                            }
+                        });
+                    } catch (SQLException ex) {
+                        SwingUtilities.invokeLater(() -> {
+                            model.setValueAt(oldValue, row, col);
+                            JOptionPane.showMessageDialog(RECURSOS.this,
+                                "Error al actualizar: " + ex.getMessage(),
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        });
+                        ex.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(RECURSOS.this,
+                "El valor para INVENTARIO debe ser un número entero.",
+                "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            model.setValueAt(oldValue, row, col);
+        }
         return;
     }
 
-    Object cedulaValue = model.getValueAt(row, cedulaIndex); // Usar CEDULA como identificador
-
+    // Manejar otros campos normalmente
     new SwingWorker<Void, Void>() {
         @Override
         protected Void doInBackground() throws Exception {
             try (Connection conn = CONEXION.conectar();
                  PreparedStatement pstmt = conn.prepareStatement(
-                     "UPDATE USUARIOS SET " + columnName + " = ? WHERE CEDULA = ?")) {
+                     "UPDATE EQUIPO SET " + columnName + " = ? WHERE INVENTARIO = ?")) {
 
-                pstmt.setObject(1, newValue);
-                pstmt.setObject(2, cedulaValue);
+                if (newValue instanceof Number) {
+                    pstmt.setObject(1, newValue);
+                } else {
+                    pstmt.setString(1, newValue.toString());
+                }
+
+                pstmt.setInt(2, Integer.parseInt(numeroInventario.toString()));
 
                 int affectedRows = pstmt.executeUpdate();
 
                 SwingUtilities.invokeLater(() -> {
                     if (affectedRows > 0) {
-                        JOptionPane.showMessageDialog(USUARIOS.this,
-                            "¡Usuario actualizado correctamente!",
+                        JOptionPane.showMessageDialog(RECURSOS.this,
+                            "¡Recurso actualizado correctamente!",
                             "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         model.setValueAt(oldValue, row, col);
-                        JOptionPane.showMessageDialog(USUARIOS.this,
-                            "No se pudo actualizar el usuario",
+                        JOptionPane.showMessageDialog(RECURSOS.this,
+                            "No se pudo actualizar el recurso",
                             "Error", JOptionPane.WARNING_MESSAGE);
                     }
                 });
             } catch (SQLException ex) {
                 SwingUtilities.invokeLater(() -> {
                     model.setValueAt(oldValue, row, col);
-                    JOptionPane.showMessageDialog(USUARIOS.this,
+                    JOptionPane.showMessageDialog(RECURSOS.this,
                         "Error al actualizar: " + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
                 });
@@ -329,33 +384,37 @@ private void actualizarEnBD(int row, int col, Object newValue) {
     }.execute();
 }
 
+
+
+
+
+
     
     private void ajustarAnchoColumnas() {
     // Asegurarse que la tabla y el modelo de columnas existen
-    if (USUARIOS == null || USUARIOS.getColumnModel() == null) return;
+    if (RECURSOS == null || RECURSOS.getColumnModel() == null) return;
     
     // Desactivar autoajuste temporalmente
-    USUARIOS.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    RECURSOS.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     
-    TableColumnModel columnModel = USUARIOS.getColumnModel();
+    TableColumnModel columnModel = RECURSOS.getColumnModel();
     
-    for (int column = 0; column < USUARIOS.getColumnCount(); column++) {
+    for (int column = 0; column < RECURSOS.getColumnCount(); column++) {
         TableColumn col = columnModel.getColumn(column);
         int width = 15; // Margen mínimo
         
         // 1. Obtener ancho del encabezado
         TableCellRenderer headerRenderer = col.getHeaderRenderer();
         if (headerRenderer == null) {
-            headerRenderer = USUARIOS.getTableHeader().getDefaultRenderer();
+            headerRenderer = RECURSOS.getTableHeader().getDefaultRenderer();
         }
-        Component headerComp = headerRenderer.getTableCellRendererComponent(
-            USUARIOS, col.getHeaderValue(), false, false, -1, column);
+        Component headerComp = headerRenderer.getTableCellRendererComponent(RECURSOS, col.getHeaderValue(), false, false, -1, column);
         width = Math.max(width, headerComp.getPreferredSize().width);
         
         // 2. Obtener ancho máximo del contenido
-        for (int row = 0; row < USUARIOS.getRowCount(); row++) {
-            TableCellRenderer renderer = USUARIOS.getCellRenderer(row, column);
-            Component comp = USUARIOS.prepareRenderer(renderer, row, column);
+        for (int row = 0; row < RECURSOS.getRowCount(); row++) {
+            TableCellRenderer renderer = RECURSOS.getCellRenderer(row, column);
+            Component comp = RECURSOS.prepareRenderer(renderer, row, column);
             width = Math.max(width, comp.getPreferredSize().width + 10); // +10 de margen
         }
         
@@ -363,8 +422,70 @@ private void actualizarEnBD(int row, int col, Object newValue) {
         col.setPreferredWidth(Math.min(Math.max(width, 50), 300));
     }
     
-    // Restaurar el autoajuste
-    USUARIOS.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+      // Restaurar el autoajuste
+    RECURSOS.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    }
+   private void eliminarRecursoSeleccionado() {
+    int filaSeleccionada = RECURSOS.getSelectedRow();
+    
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(this, 
+            "Por favor seleccione un recurso de la tabla", 
+            "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Obtener el número de inventario (primera columna visible)
+    Object numeroInventario = model.getValueAt(filaSeleccionada, 1);
+    Object marca = model.getValueAt(filaSeleccionada, 2);
+    
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        "¿Está seguro que desea eliminar el recurso?\n" +
+        "Inventario: " + numeroInventario + "\n" +
+        "Marca: " + marca,
+        "Confirmar Eliminación",
+        JOptionPane.YES_NO_OPTION);
+    
+    if (confirmacion == JOptionPane.YES_OPTION) {
+        eliminarPorInventario(numeroInventario, filaSeleccionada);
+    }
+}
+
+private void eliminarPorInventario(Object numeroInventario, int filaTabla) {
+    new SwingWorker<Void, Void>() {
+        @Override
+        protected Void doInBackground() throws Exception {
+            try (Connection conn = CONEXION.conectar();
+                 PreparedStatement pstmt = conn.prepareStatement(
+                     "DELETE FROM EQUIPO WHERE INVENTARIO = ?")) {
+                
+                pstmt.setBigDecimal(1, new BigDecimal(numeroInventario.toString()));
+                
+                int affectedRows = pstmt.executeUpdate();
+                
+                SwingUtilities.invokeLater(() -> {
+                    if (affectedRows > 0) {
+                        model.removeRow(filaTabla);
+                        JOptionPane.showMessageDialog(RECURSOS.this,
+                            "Recurso eliminado correctamente",
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(RECURSOS.this,
+                            "No se pudo eliminar el recurso",
+                            "Error", JOptionPane.WARNING_MESSAGE);
+                    }
+                });
+            } catch (SQLException ex) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(RECURSOS.this,
+                        "Error al eliminar: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                });
+                ex.printStackTrace();
+            }
+            return null;
+        }
+    }.execute();
 }
 
 
@@ -387,11 +508,11 @@ private void actualizarEnBD(int row, int col, Object newValue) {
         jPanel1 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        USUARIOS = new javax.swing.JTable();
+        RECURSOS = new javax.swing.JTable();
         buscador = new javax.swing.JTextField();
         buscar = new javax.swing.JButton();
         Eliminar = new javax.swing.JButton();
-        crear_usuario = new javax.swing.JButton();
+        crear_recurso = new javax.swing.JButton();
         Inhabilitar = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(980, 720));
@@ -400,10 +521,10 @@ private void actualizarEnBD(int row, int col, Object newValue) {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
-        jLabel8.setText("Administracion de Usuarios");
+        jLabel8.setText("Administracion de Recursos");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 0, 430, 40));
 
-        USUARIOS.setModel(new javax.swing.table.DefaultTableModel(
+        RECURSOS.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -414,12 +535,12 @@ private void actualizarEnBD(int row, int col, Object newValue) {
                 "Title 1", "Title 2", "Title 3", "Title 4", "Title 5", "Title 6", "Title 7"
             }
         ));
-        USUARIOS.addMouseListener(new java.awt.event.MouseAdapter() {
+        RECURSOS.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                USUARIOSMouseClicked(evt);
+                RECURSOSMouseClicked(evt);
             }
         });
-        jScrollPane2.setViewportView(USUARIOS);
+        jScrollPane2.setViewportView(RECURSOS);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 960, 560));
         jPanel1.add(buscador, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 60, 170, 30));
@@ -435,13 +556,8 @@ private void actualizarEnBD(int row, int col, Object newValue) {
         });
         jPanel1.add(Eliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 50, 130, 40));
 
-        crear_usuario.setText("CREAR USUARIO");
-        crear_usuario.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                crear_usuarioActionPerformed(evt);
-            }
-        });
-        jPanel1.add(crear_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 130, 40));
+        crear_recurso.setText("CREAR RECURSO");
+        jPanel1.add(crear_recurso, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 130, 40));
 
         Inhabilitar.setText("ACTIVAR/INACTIVO");
         Inhabilitar.addActionListener(new java.awt.event.ActionListener() {
@@ -463,35 +579,48 @@ private void actualizarEnBD(int row, int col, Object newValue) {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void USUARIOSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_USUARIOSMouseClicked
+    private void RECURSOSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RECURSOSMouseClicked
      if (evt.getClickCount() == 2) { // Doble clic
-            int row = USUARIOS.getSelectedRow();
+            int row = RECURSOS.getSelectedRow();
             if (row >= 0) {
                 // Puedes implementar edición específica aquí si lo deseas
             }
         }          // TODO add your handling code here:
-    }//GEN-LAST:event_USUARIOSMouseClicked
+    }//GEN-LAST:event_RECURSOSMouseClicked
 
     private void InhabilitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InhabilitarActionPerformed
-        int fila = USUARIOS.getSelectedRow();
+    int fila = RECURSOS.getSelectedRow();
     if (fila == -1) {
-        JOptionPane.showMessageDialog(this, "Selecciona un usuario para cambiar su estado.");
+        JOptionPane.showMessageDialog(this, "Selecciona un recurso para cambiar su estado.");
         return;
     }
 
-    String cedula = USUARIOS.getValueAt(fila, 9).toString(); // CEDULA debe estar en la columna 9
-    String estadoActual = USUARIOS.getValueAt(fila, 10).toString(); // ESTADO debe estar en la columna 10
-    String nuevoEstado = estadoActual.equalsIgnoreCase("ACTIVO") ? "INACTIVO" : "ACTIVO";
+    // Obtener el número de inventario y el estado actual
+    Object inventario = RECURSOS.getValueAt(fila, 1); // Columna 0 es INVENTARIO
+    Object estadoActual = RECURSOS.getValueAt(fila, 5); // Columna 4 es ESTADO
+
+    // Validar que el inventario no esté vacío
+    if (inventario == null || inventario.toString().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "El número de inventario no puede estar vacío.");
+        return;
+    }
+
+    String nuevoEstado = estadoActual.toString().equalsIgnoreCase("ACTIVO") ? "INACTIVO" : "ACTIVO";
 
     try (Connection conn = CONEXION.conectar();
-         PreparedStatement pstmt = conn.prepareStatement("UPDATE USUARIOS SET ESTADO = ? WHERE CEDULA = ?")) {
+         PreparedStatement pstmt = conn.prepareStatement("UPDATE EQUIPO SET ESTADO = ? WHERE INVENTARIO = ?")) {
 
         pstmt.setString(1, nuevoEstado);
-        pstmt.setString(2, cedula);
-        pstmt.executeUpdate();
+        pstmt.setString(2, inventario.toString().trim());
+        int filasAfectadas = pstmt.executeUpdate();
 
-        JOptionPane.showMessageDialog(this, "Estado actualizado a: " + nuevoEstado);
-        cargarDatos(); // Refresca la tabla
+        if (filasAfectadas > 0) {
+            // Actualizar el estado en la tabla
+            RECURSOS.setValueAt(nuevoEstado, fila, 5);
+            JOptionPane.showMessageDialog(this, "Estado actualizado a: " + nuevoEstado);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo actualizar el estado. Verifica que el recurso exista.");
+        }
 
     } catch (SQLException ex) {
         ex.printStackTrace();
@@ -502,53 +631,19 @@ private void actualizarEnBD(int row, int col, Object newValue) {
 
     private void EliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarActionPerformed
                            
-    int fila = USUARIOS.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(this, "Selecciona un usuario para eliminar.");
-        return;
-    }
-
-    String cedula = USUARIOS.getValueAt(fila, 9).toString(); // Ajusta si la columna es distinta
-
-    int confirmar = JOptionPane.showConfirmDialog(this,
-        "¿Estás seguro de que quieres eliminar este usuario?\nEsta acción no se puede deshacer.",
-        "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-
-    if (confirmar == JOptionPane.YES_OPTION) {
-        try (Connection conn = CONEXION.conectar();
-             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM USUARIOS WHERE CEDULA = ?")) {
-
-            pstmt.setString(1, cedula);
-            int filasAfectadas = pstmt.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente.");
-                cargarDatos(); // Refresca tabla
-            } else {
-                JOptionPane.showMessageDialog(this, "No se encontró el usuario.");
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al eliminar: " + ex.getMessage());
-        }
-    }
+    eliminarRecursoSeleccionado();
 
         // TODO add your handling code here:
     }//GEN-LAST:event_EliminarActionPerformed
-
-    private void crear_usuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crear_usuarioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_crear_usuarioActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Eliminar;
     private javax.swing.JButton Inhabilitar;
-    private javax.swing.JTable USUARIOS;
+    private javax.swing.JTable RECURSOS;
     private javax.swing.JTextField buscador;
     private javax.swing.JButton buscar;
-    private javax.swing.JButton crear_usuario;
+    private javax.swing.JButton crear_recurso;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

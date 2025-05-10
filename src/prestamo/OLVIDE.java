@@ -37,59 +37,69 @@ public class OLVIDE extends javax.swing.JFrame {
         // Listeners
         validar.addActionListener(e -> validarDatos());
         guardar.addActionListener(e -> cambiarContraseña());
+        cancelar.addActionListener(e -> volverALogin());
     }
     
     private boolean validarDatos() {
-        String cedulaInput = cedula.getText().trim();
-        String correoInput = correo.getText().trim().toLowerCase();
+    String cedulaInput = cedula.getText().trim();
+    String correoInput = correo.getText().trim().toLowerCase();
+
+    // Verificar campos vacíos
+    if (cedulaInput.isEmpty() || correoInput.isEmpty() || 
+        fecha_nac.getDate() == null || fecha_exp.getDate() == null) {
+        JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios");
+        return false;
+    }
+
+    try (Connection con = CONEXION.conectar()) {
+        // **Nuevo SQL para verificar estado y datos del usuario**
+        String sql = "SELECT estado, COUNT(*) AS coincidencias FROM usuarios WHERE cedula = ? " +
+                     "AND correo = LOWER(?) " +
+                     "AND fecha_nac = ? " +
+                     "AND fecha_exp = ? GROUP BY estado";
         
-        // Verificar bloqueo
-        if (estaBloqueada(cedulaInput)) {
-            mostrarMensajeBloqueo();
-            return false;
-        }
-        
-        // Validar campos vacíos
-        if (cedulaInput.isEmpty() || correoInput.isEmpty() || 
-            fecha_nac.getDate() == null || fecha_exp.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios");
-            return false;
-        }
-        
-        try (Connection con = CONEXION.conectar()) {
-            String sql = "SELECT COUNT(*) FROM usuarios WHERE cedula = ? " +
-                        "AND correo = LOWER(?) " +
-                        "AND TRUNC(fecha_nac) = ? " +
-                        "AND TRUNC(fecha_exp) = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, cedulaInput);
+            ps.setString(2, correoInput);
+            ps.setDate(3, new java.sql.Date(fecha_nac.getDate().getTime()));
+            ps.setDate(4, new java.sql.Date(fecha_exp.getDate().getTime()));
             
-            try (PreparedStatement ps = con.prepareStatement(sql)) {
-                ps.setString(1, cedulaInput);
-                ps.setString(2, correoInput);
-                ps.setDate(3, new java.sql.Date(fecha_nac.getDate().getTime()));
-                ps.setDate(4, new java.sql.Date(fecha_exp.getDate().getTime()));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String estado = rs.getString("estado");
+                int coincidencias = rs.getInt("coincidencias");
                 
-                ResultSet rs = ps.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Validación exitosa
-                    reiniciarIntentos(cedulaInput);
+                if ("INACTIVO".equalsIgnoreCase(estado)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "El usuario está bloqueado. Contacte al administrador para desbloquearlo.",
+                        "Cuenta Bloqueada", JOptionPane.WARNING_MESSAGE);
+                    return false;
+                }
+                
+                if (coincidencias > 0) {
+                    // **Reiniciar intentos y habilitar campos de contraseña**
+                    reiniciarIntentos(cedulaInput, con);
                     habilitarCamposContraseña(true);
                     return true;
                 } else {
-                    // Validación fallida
-                    incrementarIntentos(cedulaInput);
-                    mostrarMensajeIntentoFallido(cedulaInput);
+                    // **Incrementar intentos y bloquear si es necesario**
+                    incrementarIntentos(cedulaInput, con);
                     return false;
                 }
+            } else {
+                // **Sin coincidencias (datos incorrectos)**
+                incrementarIntentos(cedulaInput, con);
+                return false;
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Error de conexión a la base de datos: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-            return false;
         }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, 
+            "Error de conexión a la base de datos: " + e.getMessage(),
+            "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        return false;
     }
-    
+}
     private boolean estaBloqueada(String cedula) {
         Pair<Integer, Long> intentos = intentosPorCedula.get(cedula);
         if (intentos == null) return false;
@@ -105,14 +115,52 @@ public class OLVIDE extends javax.swing.JFrame {
         return intentos.getLeft() >= MAX_INTENTOS;
     }
     
-    private void incrementarIntentos(String cedula) {
-        Pair<Integer, Long> intentos = intentosPorCedula.getOrDefault(cedula, Pair.of(0, System.currentTimeMillis()));
-        intentosPorCedula.put(cedula, Pair.of(intentos.getLeft() + 1, intentos.getRight()));
+    private void incrementarIntentos(String cedula, Connection con) throws SQLException {
+    String sql = "SELECT intentos FROM usuarios WHERE cedula = ?";
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, cedula);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            int intentos = rs.getInt("intentos") + 1;
+            
+            // **Actualizar intentos**
+            sql = "UPDATE usuarios SET intentos = ? WHERE cedula = ?";
+            try (PreparedStatement psUpdate = con.prepareStatement(sql)) {
+                psUpdate.setInt(1, intentos);
+                psUpdate.setString(2, cedula);
+                psUpdate.executeUpdate();
+            }
+            
+            if (intentos >= 3) {
+                // **Bloquear usuario**
+                sql = "UPDATE usuarios SET estado = 'INACTIVO' WHERE cedula = ?";
+                try (PreparedStatement psBloqueo = con.prepareStatement(sql)) {
+                    psBloqueo.setString(1, cedula);
+                    psBloqueo.executeUpdate();
+                }
+                
+                JOptionPane.showMessageDialog(this,
+                    "El usuario ha sido bloqueado después de 3 intentos fallidos.",
+                    "Cuenta Bloqueada", JOptionPane.WARNING_MESSAGE);
+            } else {
+                int intentosRestantes = 3 - intentos;
+                JOptionPane.showMessageDialog(this,
+                    "Datos incorrectos. Intentos restantes: " + intentosRestantes,
+                    "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
     }
+}
+
     
-    private void reiniciarIntentos(String cedula) {
-        intentosPorCedula.remove(cedula);
+    private void reiniciarIntentos(String cedula, Connection con) throws SQLException {
+    String sql = "UPDATE usuarios SET intentos = 0 WHERE cedula = ?";
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, cedula);
+        ps.executeUpdate();
     }
+}
     
     private void mostrarMensajeIntentoFallido(String cedula) {
         int intentos = intentosPorCedula.get(cedula).getLeft();
@@ -228,7 +276,10 @@ public class OLVIDE extends javax.swing.JFrame {
         }
     }
 
-
+    private void volverALogin() {
+        this.dispose();
+        new LOGIN().setVisible(true);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -261,6 +312,7 @@ public class OLVIDE extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         con_nueva = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
+        cancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -269,8 +321,8 @@ public class OLVIDE extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Arial", 1, 30)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("REGISTRATE");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 30, 240, 40));
+        jLabel2.setText("RECUPERAR CONTRASEÑA");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 30, 490, 40));
 
         jLabel1.setBackground(new java.awt.Color(0, 0, 153));
         jLabel1.setToolTipText("");
@@ -289,7 +341,7 @@ public class OLVIDE extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(204, 0, 0));
-        jLabel5.setText("seas tu despues de validar la informacion te permitira cambiar la contraseña, si a los 3 intentos ");
+        jLabel5.setText("seas tu, despues de validar la informacion te permitira cambiar la contraseña, si a los 3 intentos ");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 560, 30));
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
@@ -350,7 +402,7 @@ public class OLVIDE extends javax.swing.JFrame {
                 guardarActionPerformed(evt);
             }
         });
-        jPanel1.add(guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 720, 160, 50));
+        jPanel1.add(guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 720, 160, 50));
 
         con_confirmar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel1.add(con_confirmar, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 650, 210, 40));
@@ -369,6 +421,17 @@ public class OLVIDE extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
         jLabel6.setText("Cambiar Contraseña");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 540, 290, 40));
+
+        cancelar.setBackground(new java.awt.Color(0, 0, 0));
+        cancelar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        cancelar.setForeground(new java.awt.Color(255, 255, 255));
+        cancelar.setText("CANCELAR");
+        cancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(cancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 720, 160, 50));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -409,12 +472,18 @@ public class OLVIDE extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_guardarActionPerformed
 
+    private void cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarActionPerformed
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cancelarActionPerformed
+
     /**
      * @param args the command line arguments
      */
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cancelar;
     private javax.swing.JTextField cedula;
     private javax.swing.JPasswordField con_confirmar;
     private javax.swing.JPasswordField con_nueva;

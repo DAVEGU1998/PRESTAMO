@@ -1,107 +1,38 @@
 package prestamo;
 
 import CONEXION.CONEXION;
-import javax.swing.*;
-import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.Border;
 
-public class SALAS extends JPanel {
-    private String idUsuario; // Para almacenar el ID del usuario
-    private JCheckBox mostrarContraseña;
-    private void limpiarCamposContraseña() {
-        con_actual.setText("");
-        con_nueva.setText("");
-    }
+public class SALAS extends javax.swing.JPanel {
+
     public SALAS() {
         initComponents();
-       
-        setPreferredSize(new Dimension(980, 710));
-    
-    // Configurar el checkbox
-    mostrarContraseña = new JCheckBox("Mostrar contraseña");
-    mostrarContraseña.setFont(new Font("Arial", Font.PLAIN, 12));
-    mostrarContraseña.setOpaque(false); // Para que no se vea el fondo
-    
-    // Añadir al panel con coordenadas específicas (ajusta estos valores)
-    jPanel1.add(mostrarContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(756, 580, 150, 25));
-    
-    // Configurar el listener
-    mostrarContraseña.addActionListener(e -> {
-        char echoChar = mostrarContraseña.isSelected() ? (char)0 : '•';
-        con_actual.setEchoChar(echoChar);
-        con_nueva.setEchoChar(echoChar);
-    });
-        // Configurar el combo box de campus
-        campus.setModel(new javax.swing.DefaultComboBoxModel<>(
-            new String[] {"SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA"}));
-    }
-    public void cargarDatosUsuario(String nombreUsuario, String correoUsuario) {
-    nombre.setText(nombreUsuario);
-    nombre.setForeground(Color.WHITE);
-    cedula.setForeground(Color.WHITE);
-    
-    Connection conexion = CONEXION.conectar();
-    if (conexion == null) {
-        JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // Consulta modificada para obtener la cédula (asumiendo que la columna se llama CEDULA)
-    String sql = "SELECT ID, CEDULA, NOMBRE, APELLIDO, CORREO, CAMPUS FROM USUARIOS WHERE CORREO = ?";
-    
-    try {
-        PreparedStatement pst = conexion.prepareStatement(sql);
-        pst.setString(1, correoUsuario);
+        setBackground(Color.WHITE);
         
-        ResultSet rs = pst.executeQuery();
-        if (rs.next()) {
-            this.idUsuario = rs.getString("ID");
-            // Mostrar la cédula del usuario en el JLabel
-            cedula.setText(rs.getString("CEDULA")); // Cambiado de ID a CEDULA
-            
-            u_nombre.setText(rs.getString("NOMBRE"));
-            u_apellido.setText(rs.getString("APELLIDO"));
-            u_correo.setText(rs.getString("CORREO"));
-            
-            // Configurar el campus seleccionado
-            String campusUsuario = rs.getString("CAMPUS");
-            for (int i = 0; i < campus.getItemCount(); i++) {
-                if (campus.getItemAt(i).equals(campusUsuario)) {
-                    campus.setSelectedIndex(i);
-                    break;
-                }
-            }
-        }
         
-        rs.close();
-        pst.close();
-        conexion.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al cargar datos del usuario", "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
     }
-}
+   
     
-    // Método para actualizar los datos del usuario
-    
-// En la clase PERFIL
-public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
-        nombre.setText(nombreUsuario);
-        cedula.setText(correoUsuario);
-        
-        // Asegurar que el texto sea visible (blanco sobre fondo oscuro)
-        nombre.setForeground(Color.WHITE);
-        cedula.setForeground(Color.WHITE);
-        
-        // Actualizar la visualización
-        nombre.revalidate();
-        nombre.repaint();
-        cedula.revalidate();
-        cedula.repaint();
-    }
+
+    // End of variables declaration                   
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -113,279 +44,166 @@ public void setDatosUsuario(String nombreUsuario, String correoUsuario) {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        cedula = new javax.swing.JLabel();
-        nombre = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        con_guardar = new javax.swing.JButton();
-        con_nueva = new javax.swing.JPasswordField();
-        jLabel11 = new javax.swing.JLabel();
-        con_actual = new javax.swing.JPasswordField();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         u_guardar1 = new javax.swing.JButton();
-        campus = new javax.swing.JComboBox<>();
-        u_correo = new javax.swing.JTextField();
-        u_nombre = new javax.swing.JTextField();
-        u_apellido = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
+        edificio = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        hora_fin = new javax.swing.JComboBox<>();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        fecha_fin = new com.toedter.calendar.JDateChooser();
+        fecha_inicio = new com.toedter.calendar.JDateChooser();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        descripcion = new javax.swing.JTextArea();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        aula = new javax.swing.JComboBox<>();
+        hora_inicio = new javax.swing.JComboBox<>();
+        programas = new javax.swing.JComboBox<>();
+        jLabel17 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(980, 720));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGENES/perfil 512.png"))); // NOI18N
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 140, -1, -1));
-
-        cedula.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        cedula.setForeground(new java.awt.Color(255, 255, 255));
-        cedula.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        cedula.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(cedula, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 220, 40));
-
-        nombre.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        nombre.setForeground(new java.awt.Color(255, 255, 255));
-        nombre.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        nombre.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 180, 40));
-
-        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel1.setForeground(new java.awt.Color(204, 204, 204));
-        jLabel1.setOpaque(true);
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 260, 710));
-
-        con_guardar.setBackground(new java.awt.Color(0, 0, 0));
-        con_guardar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        con_guardar.setForeground(new java.awt.Color(255, 255, 255));
-        con_guardar.setText("Guardar Cambios");
-        con_guardar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                con_guardarActionPerformed(evt);
-            }
-        });
-        jPanel1.add(con_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 610, 160, 40));
-
-        con_nueva.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(con_nueva, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 540, 210, 40));
-
-        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel11.setText("Nueva Contraseña");
-        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 490, -1, -1));
-
-        con_actual.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(con_actual, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 540, 210, 40));
-
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel10.setText("Constraseña Actual");
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 490, -1, -1));
-
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
-        jLabel4.setText("Cambiar Contraseña");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 420, 290, 40));
-
         u_guardar1.setBackground(new java.awt.Color(0, 0, 0));
         u_guardar1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         u_guardar1.setForeground(new java.awt.Color(255, 255, 255));
-        u_guardar1.setText("Guardar Cambios");
+        u_guardar1.setText("RESERVAR");
         u_guardar1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 u_guardar1ActionPerformed(evt);
             }
         });
-        jPanel1.add(u_guardar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 360, 160, 40));
+        jPanel1.add(u_guardar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 570, 160, 40));
 
-        campus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        campus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
-        jPanel1.add(campus, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 290, 210, 40));
-
-        u_correo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        u_correo.setEnabled(false);
-        jPanel1.add(u_correo, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 290, 210, 40));
-
-        u_nombre.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(u_nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 170, 210, 40));
-
-        u_apellido.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jPanel1.add(u_apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 170, 210, 40));
-
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("Apellido");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 140, -1, -1));
+        edificio.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        edificio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "JORGE LUIS BORGES", "DAVID CONSUEGRA", "CARLOS LLERAS", " " }));
+        jPanel1.add(edificio, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 260, 240, 40));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel5.setText("Campus");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 250, -1, -1));
+        jLabel5.setText("Fecha fin:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 130, 140, -1));
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel9.setText("Correo");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 260, -1, -1));
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel6.setText("Nombre");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 140, -1, -1));
+        jLabel9.setText("Edificio");
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 230, -1, -1));
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
-        jLabel8.setText("Informacion del Usuario");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 60, 380, 40));
+        jLabel8.setText("RESERVA DE SALAS");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 50, 320, 40));
+
+        hora_fin.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        hora_fin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
+        hora_fin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hora_finActionPerformed(evt);
+            }
+        });
+        jPanel1.add(hora_fin, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 260, 240, 40));
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel10.setText("Aula");
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 320, 50, -1));
+
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel11.setText("Descripcion");
+        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 430, 160, -1));
+        jPanel1.add(fecha_fin, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 160, 240, 40));
+        jPanel1.add(fecha_inicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 160, 240, 40));
+
+        descripcion.setColumns(20);
+        descripcion.setRows(5);
+        jScrollPane1.setViewportView(descripcion);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 460, 810, 70));
+
+        jLabel12.setText("Horarios disponibles: 6:00-12:00 y 13:30-21:30");
+        jPanel1.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 200, 250, -1));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel13.setText("Fecha inicio:");
+        jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 130, 160, -1));
+
+        jLabel15.setText("Horarios disponibles: 6:00-12:00 y 13:30-21:30");
+        jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, 250, -1));
+
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel14.setText("Hora inicio:");
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 130, 140, -1));
+
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel16.setText("Hora fin:");
+        jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 230, 140, -1));
+
+        aula.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        aula.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
+        jPanel1.add(aula, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 350, 240, 40));
+
+        hora_inicio.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        hora_inicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
+        jPanel1.add(hora_inicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 160, 240, 40));
+
+        programas.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        programas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
+        jPanel1.add(programas, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 260, 240, 40));
+
+        jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel17.setText("Programas:");
+        jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 230, 150, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 978, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 671, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 671, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void con_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_con_guardarActionPerformed
-    
-    String contraseñaActual = new String(con_actual.getPassword()).trim();
-    String nuevaContraseña = new String(con_nueva.getPassword()).trim();
-    if (contraseñaActual.contains("'") || nuevaContraseña.contains("'")) {
-        JOptionPane.showMessageDialog(this, "Caracteres no permitidos en la contraseña", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    // Validación básica
-    if (contraseñaActual.isEmpty() || nuevaContraseña.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Ambos campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    if (nuevaContraseña.length() < 1) {
-        JOptionPane.showMessageDialog(this, "La contraseña actual que ingresaste esta incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    Connection conexion = CONEXION.conectar();
-    if (conexion == null) {
-        JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // 1. Verificar que la contraseña actual sea correcta
-    String sqlVerificar = "SELECT CONTRASEÑA FROM USUARIOS WHERE ID = ?";
-    
-    try {
-        // Verificación de contraseña actual
-        PreparedStatement pstVerificar = conexion.prepareStatement(sqlVerificar);
-        pstVerificar.setString(1, this.idUsuario);
-        
-        ResultSet rs = pstVerificar.executeQuery();
-        if (rs.next()) {
-            String contraseñaBD = rs.getString("CONTRASEÑA");
-            
-            if (!contraseñaActual.equals(contraseñaBD)) {
-                JOptionPane.showMessageDialog(this, "La contraseña actual no es correcta", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-        
-        rs.close();
-        pstVerificar.close();
-        
-        // 2. Actualizar la contraseña
-        String sqlActualizar = "UPDATE USUARIOS SET CONTRASEÑA = ? WHERE ID = ?";
-        PreparedStatement pstActualizar = conexion.prepareStatement(sqlActualizar);
-        pstActualizar.setString(1, nuevaContraseña);
-        pstActualizar.setString(2, this.idUsuario);
-        
-        int filasAfectadas = pstActualizar.executeUpdate();
-        if (filasAfectadas > 0) {
-            JOptionPane.showMessageDialog(this, "Contraseña actualizada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            // Limpiar campos después de éxito
-            limpiarCamposContraseña();
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo actualizar la contraseña", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        
-        pstActualizar.close();
-        conexion.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al actualizar la contraseña: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
-              // TODO add your handling code here:
-    }//GEN-LAST:event_con_guardarActionPerformed
-
     private void u_guardar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_u_guardar1ActionPerformed
                                            
-        String nuevoNombre = u_nombre.getText().trim();
-        String nuevoApellido = u_apellido.getText().trim();
-        String nuevoCorreo = u_correo.getText().trim();
-        String nuevoCampus = campus.getSelectedItem().toString();
+    
         
-        // Validación de campos
-        if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoCorreo.isEmpty() || 
-            nuevoCampus.equals("SELECCIONAR")) {
-            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        Connection conexion = CONEXION.conectar();
-        if (conexion == null) {
-            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        String sql = "UPDATE USUARIOS SET NOMBRE = ?, APELLIDO = ?, CORREO = ?, CAMPUS = ? WHERE ID = ?";
-        
-        try {
-            PreparedStatement pst = conexion.prepareStatement(sql);
-            pst.setString(1, nuevoNombre);
-            pst.setString(2, nuevoApellido);
-            pst.setString(3, nuevoCorreo);
-            pst.setString(4, nuevoCampus);
-            pst.setString(5, this.idUsuario);
-            
-            int filasAfectadas = pst.executeUpdate();
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(this, "Datos actualizados correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudo actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            
-            pst.close();
-            conexion.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al actualizar datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
         
         // TODO add your handling code here:
     }//GEN-LAST:event_u_guardar1ActionPerformed
 
+    private void hora_finActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hora_finActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_hora_finActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> campus;
-    private javax.swing.JLabel cedula;
-    private javax.swing.JPasswordField con_actual;
-    private javax.swing.JButton con_guardar;
-    private javax.swing.JPasswordField con_nueva;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> aula;
+    private javax.swing.JTextArea descripcion;
+    private javax.swing.JComboBox<String> edificio;
+    private com.toedter.calendar.JDateChooser fecha_fin;
+    private com.toedter.calendar.JDateChooser fecha_inicio;
+    private javax.swing.JComboBox<String> hora_fin;
+    private javax.swing.JComboBox<String> hora_inicio;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel nombre;
-    private javax.swing.JTextField u_apellido;
-    private javax.swing.JTextField u_correo;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> programas;
     private javax.swing.JButton u_guardar1;
-    private javax.swing.JTextField u_nombre;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,15 +1,23 @@
 package prestamo;
 
+import CONEXION.CONEXION;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 public class EQUIPOS extends javax.swing.JPanel {
@@ -22,8 +30,95 @@ public class EQUIPOS extends javax.swing.JPanel {
         cargarDatosCombobox();
         configurarDateChoosers();
         estiloBotonDelgado();
+        configurarBotonInfo();
+        
+    }
+    private void configurarBotonInfo() {
+        // Estilo básico del botón
+        botonInfo.setContentAreaFilled(false);
+        botonInfo.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        botonInfo.setFocusPainted(false);
+        
+        // Icono de información (opcional)
+        try {
+            ImageIcon icono = new ImageIcon(getClass().getResource("/imagenes/info.png"));
+            Image img = icono.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            botonInfo.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            // Si no hay icono, se muestra texto
+            botonInfo.setText("?");
+        }
+        
+        // Comportamiento al pasar el mouse
+        botonInfo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                botonInfo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                botonInfo.setBackground(new Color(230, 230, 230));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                botonInfo.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                botonInfo.setBackground(null);
+            }
+        });
+        
+        // Acción al hacer clic
+        botonInfo.addActionListener(e -> mostrarDescripcionCompleta());
     }
 
+    private void mostrarDescripcionCompleta() {
+        String descripcion = obtenerDescripcionActual();
+        
+        if (descripcion == null || descripcion.isEmpty()) {
+            descripcion = "No hay descripción disponible para este recurso";
+        }
+        
+        // Crear un área de texto con scroll
+        JTextArea textArea = new JTextArea(descripcion);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBackground(new Color(245, 245, 245));
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(350, 150));
+        
+        // Mostrar en un diálogo
+        JOptionPane.showMessageDialog(
+            this,
+            scrollPane,
+            "Descripción Detallada",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private String obtenerDescripcionActual() {
+        // Implementación según tu conexión a BD
+        try {
+            if (recurso.getSelectedItem() != null && !recurso.getSelectedItem().equals("SELECCIONE")) {
+                CONEXION conexion = new CONEXION();
+                String sql = "SELECT DESCRIPCION FROM EQUIPO WHERE MARCA = ?";
+                var conn = conexion.conectar();
+                var stmt = conn.prepareStatement(sql);
+                stmt.setString(1, (String) recurso.getSelectedItem());
+                var rs = stmt.executeQuery();
+                
+                if (rs.next()) {
+                    return rs.getString("DESCRIPCION");
+                }
+                
+                rs.close();
+                stmt.close();
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private void personalizarComponentes() {
         // Configuración para todos los JComboBox
         for (Component comp : jPanel1.getComponents()) {
@@ -99,19 +194,71 @@ public class EQUIPOS extends javax.swing.JPanel {
     }
 
     private void cargarDatosCombobox() {
-        // Datos de ejemplo - reemplaza con tus datos reales
-        String[] edificios = {"SELECCIONAR", "Edificio A", "Edificio B", "Edificio C"};
-        edificio.setModel(new DefaultComboBoxModel<>(edificios));
+    // Cargar tipos de recursos únicos desde la base de datos
+    DefaultComboBoxModel<String> modeloTipos = new DefaultComboBoxModel<>();
+    modeloTipos.addElement("SELECCIONE"); // Agregar la opción inicial
+    
+    try {
+        CONEXION conexion = new CONEXION();
+        String sql = "SELECT DISTINCT TIPO_RECURSO FROM EQUIPO ORDER BY TIPO_RECURSO";
+        var conn = conexion.conectar();
+        var stmt = conn.createStatement();
+        var rs = stmt.executeQuery(sql);
         
-        String[] aulas = {"SELECCIONAR", "Aula 101", "Aula 102", "Aula 201"};
-        aula.setModel(new DefaultComboBoxModel<>(aulas));
+        while (rs.next()) {
+            String tipoRecurso = rs.getString("TIPO_RECURSO");
+            modeloTipos.addElement(tipoRecurso);
+        }
         
-        String[] tipos = {"SELECCIONAR", "Equipo Audiovisual", "Computador", "Proyector"};
-        tipo.setModel(new DefaultComboBoxModel<>(tipos));
-        
-        String[] recursos = {"SELECCIONAR", "Portátil HP", "Proyector Epson", "Tableta Samsung"};
-        recurso.setModel(new DefaultComboBoxModel<>(recursos));
+        rs.close();
+        stmt.close();
+        conn.close();
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    
+    // Asignar el modelo al JComboBox tipo
+    tipo.setModel(modeloTipos);
+    
+    // Agregar listener para cargar recursos relacionados
+    tipo.addActionListener(e -> cargarRecursosPorTipo());
+}
+
+private void cargarRecursosPorTipo() {
+    String tipoSeleccionado = (String) tipo.getSelectedItem();
+    DefaultComboBoxModel<String> modeloRecursos = new DefaultComboBoxModel<>();
+    modeloRecursos.addElement("SELECCIONE"); // Opción inicial
+
+    // Evitar cargar datos si no se selecciona un tipo válido
+    if (tipoSeleccionado == null || tipoSeleccionado.equals("SELECCIONE")) {
+        recurso.setModel(modeloRecursos);
+        return;
+    }
+
+    try {
+        CONEXION conexion = new CONEXION();
+        String sql = "SELECT DISTINCT MARCA FROM EQUIPO WHERE TIPO_RECURSO = ? ORDER BY MARCA";
+        var conn = conexion.conectar();
+        var stmt = conn.prepareStatement(sql);
+        stmt.setString(1, tipoSeleccionado);
+        var rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            String marca = rs.getString("MARCA");
+            modeloRecursos.addElement(marca);
+        }
+        
+        rs.close();
+        stmt.close();
+        conn.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    // Asignar el modelo al JComboBox recurso
+    recurso.setModel(modeloRecursos);
+}
+
 
     private void configurarDateChoosers() {
         Color colorBorde = new Color(200, 200, 200);
@@ -156,8 +303,9 @@ public class EQUIPOS extends javax.swing.JPanel {
                 u_guardar1.setBackground(new Color(70, 130, 220));
             }
         });
+        
     }
-    
+
     // End of variables declaration                   
 
 
@@ -194,6 +342,7 @@ public class EQUIPOS extends javax.swing.JPanel {
         jLabel16 = new javax.swing.JLabel();
         aula = new javax.swing.JComboBox<>();
         hora_inicio = new javax.swing.JComboBox<>();
+        botonInfo = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(980, 720));
 
@@ -294,11 +443,28 @@ public class EQUIPOS extends javax.swing.JPanel {
         hora_inicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONAR", "BUCARAMANGA", "SAN GIL", "BARRANCABERMEJA", "BOGOTA" }));
         jPanel1.add(hora_inicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 360, 240, 40));
 
+        botonInfo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        botonInfo.setText("?");
+        botonInfo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                botonInfoMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                botonInfoMouseExited(evt);
+            }
+        });
+        botonInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonInfoActionPerformed(evt);
+            }
+        });
+        jPanel1.add(botonInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 160, 30, 40));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 978, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -318,9 +484,51 @@ public class EQUIPOS extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_hora_finActionPerformed
 
+    private void botonInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonInfoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonInfoActionPerformed
+
+    private void botonInfoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonInfoMouseExited
+        botonInfo.setToolTipText(null);// TODO add your handling code here:
+    }//GEN-LAST:event_botonInfoMouseExited
+
+    private void botonInfoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonInfoMouseEntered
+        String tipoSeleccionado = (String) tipo.getSelectedItem();
+        String recursoSeleccionado = (String) recurso.getSelectedItem();
+
+        // Validar que no sean "SELECCIONE"
+        if (tipoSeleccionado != null && recursoSeleccionado != null &&
+            !tipoSeleccionado.equals("SELECCIONE") && !recursoSeleccionado.equals("SELECCIONE")) {
+
+            try {
+                CONEXION conexion = new CONEXION();
+                String sql = "SELECT DESCRIPCION FROM EQUIPO WHERE TIPO_RECURSO = ? AND MARCA = ?";
+                var conn = conexion.conectar();
+                var stmt = conn.prepareStatement(sql);
+                stmt.setString(1, tipoSeleccionado);
+                stmt.setString(2, recursoSeleccionado);
+                var rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    String descripcionTexto = rs.getString("DESCRIPCION");
+
+                    // Mostrar la descripción como tooltip
+                    botonInfo.setToolTipText("<html><p style='width:200px;'>" + descripcionTexto + "</p></html>");
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_botonInfoMouseEntered
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> aula;
+    private javax.swing.JButton botonInfo;
     private javax.swing.JTextArea descripcion;
     private javax.swing.JComboBox<String> edificio;
     private com.toedter.calendar.JDateChooser fecha_fin;
