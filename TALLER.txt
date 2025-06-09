@@ -1,0 +1,73 @@
+DECLARE
+  v_codagencia AGENCIA.CODIGO%TYPE;
+  v_cedcliente CLIENTE.CEDULA%TYPE;
+  v_placa COCHE.PLACA%TYPE;
+BEGIN
+  -- Obtener código de agencia
+  SELECT CODIGO INTO v_codagencia
+  FROM AGENCIA
+  WHERE NOMBRE = 'Agencia Ejemplo';
+
+  -- Obtener cédula del cliente
+  SELECT CEDULA INTO v_cedcliente
+  FROM CLIENTE
+  WHERE NOMBRE || ' ' || APELLIDO = 'Juan Pérez';
+
+  -- Obtener placa del coche por ubicación
+  SELECT PLACA INTO v_placa
+  FROM COCHE C
+  JOIN PARQUEADERO P ON C.CODGARAJE = P.CODIGO
+  WHERE P.UBICACION = 'Ubicación X';
+
+  -- Insertar reserva
+  INSERT INTO RESERVA (CODIGO, CODAGENCIA, CEDCLIENTE, PLACACOCHE, FECHAINICIO, FECHAFINAL)
+  VALUES (SEQ_RESERVA.NEXTVAL, v_codagencia, v_cedcliente, v_placa, SYSDATE, SYSDATE + 3);
+  
+  DBMS_OUTPUT.PUT_LINE('Reserva insertada con éxito.');
+END;
+///////////////////////////////////////////////////////////////////////////////////
+BEGIN
+  UPDATE AGENCIA
+  SET DIRNUMERO = 'Nueva Dir 123', DIRBARRIO = 'Nuevo Barrio'
+  WHERE NOMBRE = 'Agencia Ejemplo'
+    AND DIRNUMERO = 'Antigua Dir 456';
+    
+  DBMS_OUTPUT.PUT_LINE('Dirección actualizada.');
+END;
+/////////////////////////////////////////////////////////////////////////////
+BEGIN
+  DELETE FROM RESERVA
+  WHERE FECHAINICIO BETWEEN TO_DATE('2024-01-01', 'YYYY-MM-DD') AND TO_DATE('2024-03-01', 'YYYY-MM-DD');
+
+  DBMS_OUTPUT.PUT_LINE('Reservas eliminadas en rango de fechas.');
+END;
+/////////////////////////////////////////////////////////////////////////////////////
+BEGIN
+  UPDATE RESERVA
+  SET FECHAINICIO = TO_DATE('2025-06-10', 'YYYY-MM-DD'),
+      FECHAFINAL = TO_DATE('2025-06-15', 'YYYY-MM-DD')
+  WHERE PLACACOCHE = 'XYZ123'
+    AND CODAGENCIA = (SELECT CODIGO FROM AGENCIA WHERE NOMBRE = 'Agencia Ejemplo')
+    AND CEDCLIENTE = (SELECT CEDULA FROM CLIENTE WHERE NOMBRE || ' ' || APELLIDO = 'Juan Pérez');
+
+  DBMS_OUTPUT.PUT_LINE('Fechas modificadas.');
+END;
+///////////////////////////////////////////////////////////////////
+DECLARE
+  v_valor NUMBER;
+BEGIN
+  SELECT C.VALORPRESTAMO * (R.FECHAFINAL - R.FECHAINICIO)
+  INTO v_valor
+  FROM RESERVA R
+  JOIN COCHE C ON R.PLACACOCHE = C.PLACA
+  JOIN AGENCIA A ON R.CODAGENCIA = A.CODIGO
+  JOIN CLIENTE CL ON R.CEDCLIENTE = CL.CEDULA
+  WHERE CL.NOMBRE || ' ' || CL.APELLIDO = 'Juan Pérez'
+    AND A.NOMBRE = 'Agencia Ejemplo'
+    AND R.FECHAINICIO = TO_DATE('2025-06-01', 'YYYY-MM-DD')
+    AND R.FECHAFINAL = TO_DATE('2025-06-05', 'YYYY-MM-DD');
+
+  DBMS_OUTPUT.PUT_LINE('Valor a pagar: ' || v_valor);
+END;
+//////////////////////////////////////////////////////////////////
+

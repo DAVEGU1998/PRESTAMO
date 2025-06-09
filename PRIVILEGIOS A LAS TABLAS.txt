@@ -1,0 +1,21 @@
+QUITAR PRIVILEGIOS************
+1. ❌ Quitar el privilegio de SELECT en una tabla:
+
+REVOKE SELECT ON PRESTAMO2025.INFO_SALAS FROM DOCENTE2025;
+2. ❌ Quitar todos los privilegios sobre una tabla:
+Debes revocar cada privilegio uno por uno:
+
+REVOKE SELECT, INSERT, UPDATE, DELETE ON PRESTAMO2025.INFO_SALAS FROM DOCENTE2025;
+3. ❌ Quitar privilegios otorgados mediante un rol:
+Si sabes que un privilegio fue otorgado a través de un rol, puedes quitar el rol:
+
+REVOKE nombre_del_rol FROM DOCENTE2025;
+Por ejemplo:
+
+REVOKE LECTOR FROM DOCENTE2025;
+DAR PRIVILEGIOS*********************
+GRANT SELECT, UPDATE ON USUARIOS TO DOCENTE2025;
+GRANT SELECT, UPDATE ON USUARIOS TO ADMINISTRATIVO2025;
+
+CREATE SYNONYM DOCENTE2025.USUARIOS FOR PRESTAMO2025.USUARIOS;
+CREATE SYNONYM ADMINISTRATIVO2025.USUARIOS FOR PRESTAMO2025.USUARIOS;
